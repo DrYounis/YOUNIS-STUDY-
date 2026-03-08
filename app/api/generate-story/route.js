@@ -35,9 +35,9 @@ Make the story unique, creative, and magical!`;
 
     // Check if Groq API key exists
     const apiKey = process.env.GROQ_API_KEY;
-    
+
     if (!apiKey) {
-      // Fallback to template stories if no API key
+      console.log('No Groq API key - using template fallback');
       return NextResponse.json(generateTemplateStory(childName, childAge, storyConcept));
     }
 
@@ -65,7 +65,7 @@ Make the story unique, creative, and magical!`;
     });
 
     if (!aiResponse.ok) {
-      console.error('Groq API error:', aiResponse.status);
+      console.error('Groq API error:', aiResponse.status, aiResponse.statusText);
       // Fallback to template
       return NextResponse.json(generateTemplateStory(childName, childAge, storyConcept));
     }
@@ -93,10 +93,18 @@ Make the story unique, creative, and magical!`;
     return NextResponse.json(storyData);
 
   } catch (error) {
-    console.error('Story generation error:', error);
+    console.error('Story generation error:', error.message);
     
-    const { childName, childAge, storyConcept } = await request.json();
-    return NextResponse.json(generateTemplateStory(childName, childAge, storyConcept));
+    try {
+      const { childName, childAge, storyConcept } = await request.json();
+      return NextResponse.json(generateTemplateStory(childName, childAge, storyConcept));
+    } catch {
+      // Ultimate fallback
+      return NextResponse.json({
+        title: "A Magical Bedtime Story",
+        content: "Once upon a time, there was a wonderful child who loved adventures. One day, they discovered something magical that changed their life forever. And they lived happily ever after. 🌟"
+      });
+    }
   }
 }
 
