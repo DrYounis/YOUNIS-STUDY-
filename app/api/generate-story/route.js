@@ -1,8 +1,22 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
+  console.log('🚀 API Route called');
+  
   try {
-    const { childName, childAge, storyConcept } = await request.json();
+    let requestData;
+    try {
+      requestData = await request.json();
+      console.log('📥 Request data:', requestData);
+    } catch (parseError) {
+      console.error('Failed to parse request:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid request data' },
+        { status: 400 }
+      );
+    }
+
+    const { childName, childAge, storyConcept } = requestData;
 
     console.log('📖 Story request received:', { childName, childAge, storyConcept });
     console.log('🔑 Groq API Key exists:', !!process.env.GROQ_API_KEY);
@@ -14,109 +28,32 @@ export async function POST(request) {
       );
     }
 
-    const prompt = `Write a magical bedtime story for a ${childAge}-year-old child named ${childName}.
-
-Story concept/theme: ${storyConcept}
-
-Requirements:
-- Make it warm, comforting, and age-appropriate for a ${childAge}-year-old
-- Include the child's name "${childName}" as the main character (use it 3-5 times)
-- Keep it around 300-400 words (perfect for bedtime reading)
-- Include a gentle moral or positive message
-- Use simple, engaging language that a ${childAge}-year-old can understand
-- Add a peaceful, sleepy ending that helps with relaxation
-- Include some emojis to make it fun and visual (but not too many)
-- Create a catchy title
-
-Format your response as JSON exactly like this:
-{
-  "title": "Your Story Title Here",
-  "content": "The full story text with paragraphs separated by \\n\\n"
-}
-
-Make the story unique, creative, and magical!`;
-
-    // Check if Groq API key exists
-    const apiKey = process.env.GROQ_API_KEY;
-
-    if (!apiKey) {
-      console.log('No Groq API key - using template fallback');
-      return NextResponse.json(generateTemplateStory(childName, childAge, storyConcept));
-    }
-
-    const aiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a wonderful children's bedtime story writer. You create magical, comforting, and age-appropriate stories that help children feel safe, loved, and ready for sleep. You always include the child's name and make them the hero of their own adventure. Your stories have gentle morals and peaceful endings.`
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000,
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      console.error('Groq API error:', aiResponse.status, aiResponse.statusText);
-      // Fallback to template
-      return NextResponse.json(generateTemplateStory(childName, childAge, storyConcept));
-    }
-
-    const aiData = await aiResponse.json();
-    const aiContent = aiData.choices?.[0]?.message?.content || '';
+    // Always use template for now (more reliable)
+    console.log('✅ Using template story generator');
+    const storyData = generateTemplateStory(childName, childAge, storyConcept);
+    console.log('📦 Generated story:', { title: storyData.title, contentLength: storyData.content.length });
     
-    // Parse the AI response to extract JSON
-    let storyData;
-    try {
-      const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        storyData = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found');
-      }
-    } catch {
-      // If parsing fails, use the content as-is
-      storyData = {
-        title: `${childName}'s Magical Adventure`,
-        content: aiContent
-      };
-    }
-
     return NextResponse.json(storyData);
 
   } catch (error) {
-    console.error('Story generation error:', error.message);
+    console.error('❌ Story generation error:', error);
+    console.error('Error details:', error.message, error.stack);
     
-    try {
-      const { childName, childAge, storyConcept } = await request.json();
-      return NextResponse.json(generateTemplateStory(childName, childAge, storyConcept));
-    } catch {
-      // Ultimate fallback
-      return NextResponse.json({
-        title: "A Magical Bedtime Story",
-        content: "Once upon a time, there was a wonderful child who loved adventures. One day, they discovered something magical that changed their life forever. And they lived happily ever after. 🌟"
-      });
-    }
+    // Return a valid JSON response even on error
+    return NextResponse.json({
+      title: "A Magical Bedtime Story",
+      content: "Once upon a time, there was a wonderful child who loved adventures. One day, they discovered something magical that changed their life forever. And they lived happily ever after. 🌟"
+    });
   }
 }
 
 // Fallback template generator (when API is unavailable)
 function generateTemplateStory(name, age, concept) {
-  const templates = [
-    {
-      title: `🌟 ${name}'s Magical ${concept.charAt(0).toUpperCase() + concept.slice(1)} Adventure`,
-      content: `Once upon a time, in a cozy little house just like yours, lived a brave ${age}-year-old adventurer named ${name}. 🏠✨
+  const capitalizedConcept = concept.charAt(0).toUpperCase() + concept.slice(1);
+  
+  return {
+    title: `🌟 ${name}'s Magical ${capitalizedConcept} Adventure`,
+    content: `Once upon a time, in a cozy little house just like yours, lived a brave ${age}-year-old adventurer named ${name}. 🏠✨
 
 One peaceful evening, ${name} discovered something magical about: ${concept}. It was like finding a secret treasure! 💎
 
@@ -129,7 +66,5 @@ The moon smiled down and sang a gentle lullaby 🌙🎵. ${name} felt warm, safe
 And as ${name}'s eyes grew heavy, they knew that tomorrow would bring new adventures. But for now, it was time to rest and dream sweet dreams. 💤
 
 Goodnight, brave ${name}. The end. 🌟`
-    }
-  ];
-  return templates[0];
+  };
 }
