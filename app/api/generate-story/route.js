@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 
+// Force server-side execution
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const { childName, childAge, storyConcept } = await request.json();
+
+    console.log('📖 Story request received:', { childName, childAge, storyConcept });
+    console.log('🔑 Groq API Key exists:', !!process.env.GROQ_API_KEY);
 
     if (!childName || !childAge || !storyConcept) {
       return NextResponse.json(
