@@ -90,6 +90,24 @@ export default function Friends() {
             <div style={styles.header}>
                 <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Friends of Younis</h1>
                 <p style={{ color: 'var(--color-text-muted)' }}>Leave a message to make my day brighter!</p>
+                <div style={{ marginTop: '2rem' }}>
+                    <a
+                        href="/friends/quiz"
+                        className="btn btn-secondary"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            fontSize: '1.2rem',
+                            padding: '1rem 2rem',
+                        }}
+                    >
+                        🎯 Take the Fun Quiz!
+                    </a>
+                    <p style={{ marginTop: '1rem', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+                        Discover what fun activities are perfect for your day!
+                    </p>
+                </div>
             </div>
 
             <form onSubmit={handleSubmit} style={styles.form}>

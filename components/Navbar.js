@@ -80,6 +80,7 @@ export default function Navbar() {
                     <Link href="/videos" style={navStyles.link}>Videos</Link>
                     <Link href="/gallery" style={navStyles.link}>Gallery</Link>
                     <Link href="/blog" style={navStyles.link}>Diaries</Link>
+                    <Link href="/bedtime-stories" style={navStyles.link}>Stories</Link>
                     <Link href="/friends" style={navStyles.link}>Friends</Link>
                     <Link href="/about" style={navStyles.link}>About</Link>
                 </div>
@@ -95,6 +96,7 @@ export default function Navbar() {
                     <Link href="/videos" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Videos</Link>
                     <Link href="/gallery" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Gallery</Link>
                     <Link href="/blog" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Diaries</Link>
+                    <Link href="/bedtime-stories" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Stories</Link>
                     <Link href="/friends" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Friends</Link>
                     <Link href="/about" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>About</Link>
                 </div>
