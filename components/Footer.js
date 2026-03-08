@@ -33,7 +33,7 @@ export default function Footer() {
                     Documenting my journey, one video and photo at a time.
                 </p>
                 <div style={styles.socials}>
-                    <a href="https://youtube.com/@DrYounis" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i></a>
+                    <a href="https://www.youtube.com/@younisadventures" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i></a>
                     <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></a>
                     <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i className="fab fa-twitter"></i></a>
                 </div>
