@@ -194,3 +194,8 @@ h6 {
   transform: scale(1.02) !important;
   z-index: 10;
 }
+
+/* Fun Zone Items - Hover Effect */
+.fun-zone-item:hover {
+  background: #f8f9ff;
+}

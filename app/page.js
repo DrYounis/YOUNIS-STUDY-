@@ -136,6 +136,7 @@ export default function Home() {
                             <div style={{ padding: '0' }}>
                                 <a
                                     href="/friends/quiz"
+                                    className="fun-zone-item"
                                     style={{
                                         display: 'block',
                                         padding: '1.5rem',
@@ -144,8 +145,6 @@ export default function Home() {
                                         borderBottom: '1px solid #f0f0f0',
                                         transition: 'background 0.3s ease',
                                     }}
-                                    onMouseEnter={(e) => e.target.style.background = '#f8f9ff'}
-                                    onMouseLeave={(e) => e.target.style.background = 'white'}
                                 >
                                     <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
                                     <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: '0.3rem' }}>
@@ -157,6 +156,7 @@ export default function Home() {
                                 </a>
                                 <a
                                     href="/bedtime-stories"
+                                    className="fun-zone-item"
                                     style={{
                                         display: 'block',
                                         padding: '1.5rem',
@@ -165,8 +165,6 @@ export default function Home() {
                                         borderBottom: '1px solid #f0f0f0',
                                         transition: 'background 0.3s ease',
                                     }}
-                                    onMouseEnter={(e) => e.target.style.background = '#f8f9ff'}
-                                    onMouseLeave={(e) => e.target.style.background = 'white'}
                                 >
                                     <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</div>
                                     <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: '0.3rem' }}>
@@ -178,6 +176,7 @@ export default function Home() {
                                 </a>
                                 <a
                                     href="/bedtime-stories/generate"
+                                    className="fun-zone-item"
                                     style={{
                                         display: 'block',
                                         padding: '1.5rem',
@@ -185,8 +184,6 @@ export default function Home() {
                                         color: '#333',
                                         transition: 'background 0.3s ease',
                                     }}
-                                    onMouseEnter={(e) => e.target.style.background = '#f8f9ff'}
-                                    onMouseLeave={(e) => e.target.style.background = 'white'}
                                 >
                                     <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🌙</div>
                                     <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: '0.3rem' }}>
