@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
 
-// Force server-side execution
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
 export async function POST(request) {
   try {
     const { childName, childAge, storyConcept } = await request.json();
