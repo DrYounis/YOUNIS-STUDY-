@@ -77,6 +77,7 @@ export default function Navbar() {
                 {/* Desktop Nav */}
                 <div className="desktop-nav" style={navStyles.links}>
                     <Link href="/" style={navStyles.link}>Home</Link>
+                    <Link href="/fun-zone" style={{...navStyles.link, color: '#667eea', fontWeight: '700'}}>🎉 Fun Zone</Link>
                     <Link href="/videos" style={navStyles.link}>Videos</Link>
                     <Link href="/gallery" style={navStyles.link}>Gallery</Link>
                     <Link href="/blog" style={navStyles.link}>Diaries</Link>
@@ -94,6 +95,7 @@ export default function Navbar() {
                 {/* Mobile Nav */}
                 <div style={navStyles.mobileMenu}>
                     <Link href="/" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Home</Link>
+                    <Link href="/fun-zone" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem', color: '#667eea', fontWeight: '700' }}>🎉 Fun Zone</Link>
                     <Link href="/videos" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Videos</Link>
                     <Link href="/gallery" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Gallery</Link>
                     <Link href="/blog" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Diaries</Link>
