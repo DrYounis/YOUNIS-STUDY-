@@ -168,12 +168,15 @@ export default function KidsTools() {
   const generateAIDrawing = async (ctx, thickness) => {
     setIsGenerating(true);
     try {
-      // Improved prompt for LARGE, CLEAR coloring pages
+      // Use Pollinations Flux model for better quality (more reliable)
+      // Simpler prompt, more specific constraints
+      const subject = drawingSubject.split(',')[0].trim(); // Take first part only
       const prompt = encodeURIComponent(
-        `LARGE simple black and white coloring page for kids, ${drawingSubject}, BIG bold outlines, very thick lines, white background, cartoon style, NO shading, NO colors, NO gray, just BLACK lines on WHITE, center the drawing, make it fill the entire page, high contrast, clear simple shapes`
+        `coloring page ${subject} for children, black and white, thick lines, no gray, no shading, simple, clean, white background`
       );
       
-      const aiUrl = `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 1000)}`;
+      // Use Flux model (better quality, less hallucination)
+      const aiUrl = `https://image.pollinations.ai/prompt/${prompt}?model=flux&width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 1000)}`;
       
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -182,12 +185,16 @@ export default function KidsTools() {
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = reject;
-        setTimeout(resolve, 15000); // Longer timeout for better quality
+        setTimeout(() => {
+          console.log('AI timeout, using template');
+          resolve();
+        }, 20000);
       });
       
-      // Draw AI image LARGER - fill most of the page
+      // Draw AI image
       ctx.drawImage(img, 20, 40, CANVAS_WIDTH - 40, CANVAS_HEIGHT - 150);
     } catch (error) {
+      console.log('AI failed, using template:', error.message);
       generateTemplateDrawing(ctx, drawingSubject, thickness);
     } finally {
       setIsGenerating(false);
@@ -490,7 +497,7 @@ export default function KidsTools() {
                       fontSize: '14px',
                     }}
                   >
-                    🤖 AI Magic (Draws ANYTHING!)
+                    🤖 AI (Beta)
                   </button>
                   <button
                     onClick={() => setUseAI(false)}
@@ -506,17 +513,22 @@ export default function KidsTools() {
                       fontSize: '14px',
                     }}
                   >
-                    📝 Templates (Fast!)
+                    ✅ Templates (Best!)
                   </button>
                 </div>
                 {useAI && (
-                  <p style={{ fontSize: '0.85rem', color: '#666', margin: '10px 0' }}>
-                    ✨ AI will draw anything! Type "spiderman", "birthday cake", "pokemon" - anything!
-                  </p>
+                  <div style={{ background: '#fff3cd', padding: '10px', borderRadius: '8px', marginTop: '10px' }}>
+                    <p style={{ fontSize: '0.85rem', color: '#856404', margin: '0 0 8px 0' }}>
+                      ⚠️ AI is experimental and may create weird images
+                    </p>
+                    <p style={{ fontSize: '0.8rem', color: '#856404', margin: 0 }}>
+                      💡 Tip: Use Templates for perfect drawings every time!
+                    </p>
+                  </div>
                 )}
                 {!useAI && (
-                  <p style={{ fontSize: '0.85rem', color: '#666', margin: '10px 0' }}>
-                    📝 28 pre-made templates. Instant! Try: dog, cat, rocket, castle...
+                  <p style={{ fontSize: '0.85rem', color: '#28a745', margin: '10px 0' }}>
+                    ✅ Templates: Perfect drawings, instant generation!
                   </p>
                 )}
               </div>
@@ -675,7 +687,7 @@ export default function KidsTools() {
         </div>
 
         <div style={styles.footer}>
-          🎨 Perfect for printing and coloring! AI draws ANYTHING • Templates for quick fun • Customize your title! ⭐
+          🎨 Templates: Perfect drawings! AI: Experimental (may create weird images) ⭐
         </div>
       </div>
     </div>
