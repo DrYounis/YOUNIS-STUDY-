@@ -101,15 +101,68 @@ export default function ColoringBook() {
     canvas.height = 800;
     const ctx = canvas.getContext('2d');
 
-    // Cover Page
+    // ========== FIRST PAGE - Welcome ==========
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 600, 800);
+    
+    // Decorative border
+    const gradient = ctx.createLinearGradient(0, 0, 600, 800);
+    gradient.addColorStop(0, '#667eea');
+    gradient.addColorStop(0.5, '#764ba2');
+    gradient.addColorStop(1, '#667eea');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 600, 800);
+    
+    // White inner frame
+    ctx.fillStyle = 'white';
+    ctx.fillRect(30, 30, 540, 740);
+    
+    // Decorative corners
+    ctx.font = '40px Arial';
+    ctx.fillText('🌟', 50, 80);
+    ctx.fillText('⭐', 520, 80);
+    ctx.fillText('🌟', 50, 750);
+    ctx.fillText('⭐', 520, 750);
+    
+    // Welcome text
+    ctx.fillStyle = '#667eea';
+    ctx.font = 'bold 36px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('أهلاً بك في عالم التلوين!', 300, 180);
+    
+    // Child's name
+    ctx.fillStyle = '#764ba2';
+    ctx.font = 'bold 48px Arial, sans-serif';
+    ctx.fillText(childName, 300, 280);
+    
+    // Decorative elements
+    ctx.font = '60px Arial';
+    ctx.fillText('🎨🖍️🎨', 300, 380);
+    
+    // Message
+    ctx.fillStyle = '#333';
+    ctx.font = '24px Arial, sans-serif';
+    ctx.fillText('هذا الكتيب من صنعك!', 300, 480);
+    ctx.fillText('استمتع بالتلوين يا بطل!', 300, 540);
+    
+    // Signature
+    ctx.fillStyle = '#999';
+    ctx.font = '16px Arial, sans-serif';
+    ctx.fillText('younis.world', 300, 680);
+    ctx.fillText('صُنع بحب في حائل ❤️', 300, 720);
+
+    let imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+
+    // ========== COVER PAGE ==========
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, 600, 800);
     
     // Colorful cover border
-    const gradient = ctx.createLinearGradient(0, 0, 600, 800);
-    gradient.addColorStop(0, '#667eea');
-    gradient.addColorStop(1, '#764ba2');
-    ctx.fillStyle = gradient;
+    const gradient2 = ctx.createLinearGradient(0, 0, 600, 800);
+    gradient2.addColorStop(0, '#667eea');
+    gradient2.addColorStop(1, '#764ba2');
+    ctx.fillStyle = gradient2;
     ctx.fillRect(10, 10, 580, 780);
     
     // White inner rectangle
@@ -119,7 +172,6 @@ export default function ColoringBook() {
     // Title
     ctx.fillStyle = '#667eea';
     ctx.font = 'bold 48px Arial, sans-serif';
-    ctx.textAlign = 'center';
     ctx.fillText(bookTitle, 300, 200);
     
     // Child's name
@@ -141,11 +193,13 @@ export default function ColoringBook() {
     ctx.fillStyle = '#999';
     ctx.font = '16px Arial, sans-serif';
     ctx.fillText('younis.world', 300, 720);
+    ctx.fillText('صُنع بحب في حائل ❤️', 300, 750);
 
-    const imgData = canvas.toDataURL('image/png');
+    imgData = canvas.toDataURL('image/png');
+    pdf.addPage();
     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
 
-    // Drawing Pages
+    // ========== Drawing Pages ==========
     for (let i = 0; i < selectedPages.length; i++) {
       const drawing = selectedPages[i];
       
@@ -190,15 +244,54 @@ export default function ColoringBook() {
       ctx.fillText('الاسم:', 330, 730);
 
       const pageImgData = canvas.toDataURL('image/png');
-      
-      if (i > 0) {
-        pdf.addPage();
-      } else {
-        pdf.addPage(); // Add page after cover
-      }
-      
+      pdf.addPage();
       pdf.addImage(pageImgData, 'PNG', 0, 0, 210, 297);
     }
+
+    // ========== LAST PAGE - Thank You ==========
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 600, 800);
+    
+    // Decorative border
+    const gradient3 = ctx.createLinearGradient(0, 0, 600, 800);
+    gradient3.addColorStop(0, '#43e97b');
+    gradient3.addColorStop(1, '#38f9d7');
+    ctx.fillStyle = gradient3;
+    ctx.fillRect(0, 0, 600, 800);
+    
+    // White inner frame
+    ctx.fillStyle = 'white';
+    ctx.fillRect(30, 30, 540, 740);
+    
+    // Thank you message
+    ctx.fillStyle = '#43e97b';
+    ctx.font = 'bold 48px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('أحسنت يا بطل! 🌟', 300, 250);
+    
+    ctx.fillStyle = '#333';
+    ctx.font = '28px Arial, sans-serif';
+    ctx.fillText('أكملت الكتيب بنجاح!', 300, 350);
+    
+    // Decorative stars
+    ctx.font = '60px Arial';
+    ctx.fillText('⭐🌟⭐', 300, 450);
+    
+    // Encouragement
+    ctx.fillStyle = '#666';
+    ctx.font = '22px Arial, sans-serif';
+    ctx.fillText('نتمنى أنك استمتعت بالتلوين!', 300, 550);
+    ctx.fillText('إلى اللقاء في كتيب جديد! 👋', 300, 600);
+    
+    // Signature
+    ctx.fillStyle = '#999';
+    ctx.font = '16px Arial, sans-serif';
+    ctx.fillText('younis.world', 300, 680);
+    ctx.fillText('صُنع بحب في حائل ❤️', 300, 720);
+
+    imgData = canvas.toDataURL('image/png');
+    pdf.addPage();
+    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
 
     // Save PDF
     const filename = `${childName.replace(/\s+/g, '-')}-كتيب-تلوين.pdf`;
