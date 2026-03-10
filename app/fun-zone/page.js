@@ -4,6 +4,14 @@ import Link from 'next/link';
 export default function FunZone() {
   const activities = [
     {
+      title: '🎨 كتيب التلوين',
+      description: 'صمم كتيب تلوين مخصص باسم طفلك! اختر الصفحات وحمله PDF جاهز للطباعة!',
+      href: '/coloring-book',
+      color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      icon: '📚',
+      features: ['PDF جاهز', 'اسم الطفل', '١٠ صفحات', 'مجاني تماماً']
+    },
+    {
       title: '🎨 Kids Coloring Tools',
       description: 'Create custom coloring pages! AI draws anything or choose from 28+ templates. Print and color!',
       href: '/kids-tools',
