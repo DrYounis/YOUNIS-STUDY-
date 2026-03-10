@@ -1,3 +1,4 @@
+'use client';
 import Hero from './components/Hero';
 import Link from 'next/link';
 
@@ -106,95 +107,142 @@ export default function Home() {
 
             <Hero />
 
-            {/* 🎉 NEW: Fun Zone for Kids - Dropdown List */}
-            <section style={{ ...styles.section, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-                <div className="container">
-                    <h2 style={{ ...styles.sectionTitle, color: 'white', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
-                        🎈 Fun Zone for Younis's Friends!
+            {/* 🎉 NEW: Fun Zone for Kids - Creative Cards Design */}
+            <section style={{ ...styles.section, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', position: 'relative', overflow: 'hidden' }}>
+                {/* Animated Background Elements */}
+                <style jsx global>{`
+                    @keyframes float {
+                        0%, 100% { transform: translateY(0) rotate(0deg); }
+                        50% { transform: translateY(-20px) rotate(5deg); }
+                    }
+                    @keyframes bounce {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-10px); }
+                    }
+                    .fun-card:hover {
+                        transform: translateY(-15px) scale(1.05);
+                        box-shadow: 0 20px 60px rgba(255,255,255,0.3);
+                    }
+                    .fun-card:hover .fun-icon {
+                        animation: bounce 0.5s ease infinite;
+                    }
+                `}</style>
+                
+                {/* Floating Background Shapes */}
+                <div style={{ position: 'absolute', top: '10%', left: '5%', fontSize: '4rem', opacity: 0.1, animation: 'float 3s ease infinite' }}>🎈</div>
+                <div style={{ position: 'absolute', top: '20%', right: '10%', fontSize: '5rem', opacity: 0.1, animation: 'float 4s ease infinite' }}>⭐</div>
+                <div style={{ position: 'absolute', bottom: '15%', left: '15%', fontSize: '3rem', opacity: 0.1, animation: 'float 5s ease infinite' }}>🌟</div>
+                <div style={{ position: 'absolute', bottom: '25%', right: '5%', fontSize: '4rem', opacity: 0.1, animation: 'float 3.5s ease infinite' }}>✨</div>
+
+                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                    <h2 style={{ ...styles.sectionTitle, color: 'white', textShadow: '4px 4px 0px rgba(0,0,0,0.3)', fontSize: '3rem', marginBottom: '1rem' }}>
+                        🎈 Fun Zone for Younis's Friends! 🎈
                     </h2>
-                    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                        <details style={{
-                            background: 'white',
-                            borderRadius: '1rem',
-                            overflow: 'hidden',
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-                        }}>
-                            <summary style={{
-                                padding: '1.5rem',
-                                cursor: 'pointer',
-                                fontSize: '1.3rem',
-                                fontWeight: '600',
+                    <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.9)', fontSize: '1.3rem', marginBottom: '3rem' }}>
+                        🎮 Click for Fun Activities! 🎮
+                    </p>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
+                        {/* Fun Personality Quiz Card */}
+                        <a
+                            href="/friends/quiz"
+                            className="fun-card"
+                            style={{
+                                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                                borderRadius: '1.5rem',
+                                padding: '2rem',
+                                textDecoration: 'none',
+                                color: 'white',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                                textAlign: 'center',
+                            }}
+                        >
+                            <div className="fun-icon" style={{ fontSize: '5rem', marginBottom: '1rem' }}>🎯</div>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                                Fun Personality Quiz
+                            </h3>
+                            <p style={{ fontSize: '1rem', opacity: 0.9, lineHeight: '1.5' }}>
+                                Discover your personality type and get fun activity suggestions!
+                            </p>
+                        </a>
+
+                        {/* Bedtime Stories Library Card */}
+                        <a
+                            href="/bedtime-stories"
+                            className="fun-card"
+                            style={{
+                                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                                borderRadius: '1.5rem',
+                                padding: '2rem',
+                                textDecoration: 'none',
+                                color: 'white',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                                textAlign: 'center',
+                            }}
+                        >
+                            <div className="fun-icon" style={{ fontSize: '5rem', marginBottom: '1rem' }}>📚</div>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                                Bedtime Stories Library
+                            </h3>
+                            <p style={{ fontSize: '1rem', opacity: 0.9, lineHeight: '1.5' }}>
+                                Read magical stories created for Younis's friends!
+                            </p>
+                        </a>
+
+                        {/* AI Story Generator Card */}
+                        <a
+                            href="/bedtime-stories/generate"
+                            className="fun-card"
+                            style={{
+                                background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                                borderRadius: '1.5rem',
+                                padding: '2rem',
+                                textDecoration: 'none',
+                                color: 'white',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                                textAlign: 'center',
+                            }}
+                        >
+                            <div className="fun-icon" style={{ fontSize: '5rem', marginBottom: '1rem' }}>🌙</div>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                                AI Story Generator
+                            </h3>
+                            <p style={{ fontSize: '1rem', opacity: 0.9, lineHeight: '1.5' }}>
+                                Create a personalized bedtime story powered by AI!
+                            </p>
+                        </a>
+                    </div>
+
+                    {/* More Fun Button */}
+                    <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+                        <a
+                            href="/fun-zone"
+                            style={{
+                                display: 'inline-block',
+                                padding: '1rem 2rem',
+                                background: 'white',
                                 color: '#667eea',
-                                listStyle: 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                            }}>
-                                <span>🎮 Click for Fun Activities!</span>
-                                <span style={{ fontSize: '1.5rem' }}>▼</span>
-                            </summary>
-                            <div style={{ padding: '0' }}>
-                                <a
-                                    href="/friends/quiz"
-                                    className="fun-zone-item"
-                                    style={{
-                                        display: 'block',
-                                        padding: '1.5rem',
-                                        textDecoration: 'none',
-                                        color: '#333',
-                                        borderBottom: '1px solid #f0f0f0',
-                                        transition: 'background 0.3s ease',
-                                    }}
-                                >
-                                    <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
-                                    <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: '0.3rem' }}>
-                                        Fun Personality Quiz
-                                    </div>
-                                    <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                                        Discover your personality type and get fun activity suggestions!
-                                    </div>
-                                </a>
-                                <a
-                                    href="/bedtime-stories"
-                                    className="fun-zone-item"
-                                    style={{
-                                        display: 'block',
-                                        padding: '1.5rem',
-                                        textDecoration: 'none',
-                                        color: '#333',
-                                        borderBottom: '1px solid #f0f0f0',
-                                        transition: 'background 0.3s ease',
-                                    }}
-                                >
-                                    <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</div>
-                                    <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: '0.3rem' }}>
-                                        Bedtime Stories Library
-                                    </div>
-                                    <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                                        Read magical stories created for Younis's friends!
-                                    </div>
-                                </a>
-                                <a
-                                    href="/bedtime-stories/generate"
-                                    className="fun-zone-item"
-                                    style={{
-                                        display: 'block',
-                                        padding: '1.5rem',
-                                        textDecoration: 'none',
-                                        color: '#333',
-                                        transition: 'background 0.3s ease',
-                                    }}
-                                >
-                                    <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🌙</div>
-                                    <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: '0.3rem' }}>
-                                        AI Story Generator
-                                    </div>
-                                    <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                                        Create a personalized bedtime story powered by AI!
-                                    </div>
-                                </a>
-                            </div>
-                        </details>
+                                textDecoration: 'none',
+                                borderRadius: '50px',
+                                fontWeight: 'bold',
+                                fontSize: '1.1rem',
+                                boxShadow: '0 5px 20px rgba(0,0,0,0.2)',
+                                transition: 'all 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-5px)';
+                                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 5px 20px rgba(0,0,0,0.2)';
+                            }}
+                        >
+                            🎉 See ALL Fun Activities →
+                        </a>
                     </div>
                 </div>
             </section>
