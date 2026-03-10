@@ -1,26 +1,45 @@
 'use client';
-"use client";
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
 
 export default function Friends() {
     const [notes, setNotes] = useState([]);
     const [name, setName] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [useSupabase, setUseSupabase] = useState(false);
 
     useEffect(() => {
         fetchNotes();
     }, []);
 
     const fetchNotes = async () => {
-        const { data, error } = await supabase
-            .from('friends_notes')
-            .select('*')
-            .order('created_at', { ascending: false });
+        // Try Supabase first
+        try {
+            const { createClient } = await import('@supabase/supabase-js');
+            const supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+            );
+            
+            const { data, error } = await supabase
+                .from('friends_notes')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-        if (data) setNotes(data);
+            if (data && !error) {
+                setNotes(data);
+                setUseSupabase(true);
+                return;
+            }
+        } catch (err) {
+            console.log('Supabase not available, using localStorage');
+        }
+
+        // Fallback to localStorage
+        const savedNotes = JSON.parse(localStorage.getItem('friendsNotes') || '[]');
+        setNotes(savedNotes);
+        setUseSupabase(false);
     };
 
     const handleSubmit = async (e) => {
@@ -28,18 +47,47 @@ export default function Friends() {
         if (!name || !message) return;
 
         setLoading(true);
-        const { error } = await supabase
-            .from('friends_notes')
-            .insert([{ author_name: name, message }]);
 
-        if (!error) {
-            setName('');
-            setMessage('');
-            fetchNotes();
-        } else {
-            console.error('Supabase Error:', error);
-            alert(`Error posting note: ${error.message || JSON.stringify(error)}`);
+        // Try Supabase first
+        if (useSupabase) {
+            try {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabase = createClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+                );
+                
+                const { error } = await supabase
+                    .from('friends_notes')
+                    .insert([{ author_name: name, message }]);
+
+                if (!error) {
+                    setName('');
+                    setMessage('');
+                    fetchNotes();
+                    setLoading(false);
+                    return;
+                }
+            } catch (err) {
+                console.log('Supabase error, switching to localStorage');
+                setUseSupabase(false);
+            }
         }
+
+        // Fallback to localStorage
+        const savedNotes = JSON.parse(localStorage.getItem('friendsNotes') || '[]');
+        const newNote = {
+            id: Date.now().toString(),
+            author_name: name,
+            message,
+            created_at: new Date().toISOString(),
+        };
+        savedNotes.unshift(newNote);
+        localStorage.setItem('friendsNotes', JSON.stringify(savedNotes));
+        
+        setName('');
+        setMessage('');
+        fetchNotes();
         setLoading(false);
     };
 
@@ -130,6 +178,11 @@ export default function Friends() {
                 <button type="submit" className="btn btn-primary" disabled={loading}>
                     {loading ? 'Posting...' : 'Post Message'}
                 </button>
+                {!useSupabase && (
+                    <p style={{ marginTop: '1rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+                        💾 Messages are saved locally in your browser
+                    </p>
+                )}
             </form>
 
             <div>
