@@ -6,6 +6,7 @@ export default function StoryGenerator() {
   const [childName, setChildName] = useState('');
   const [childAge, setChildAge] = useState('');
   const [storyConcept, setStoryConcept] = useState('');
+  const [language, setLanguage] = useState('en'); // 'en' for English, 'ar' for Arabic
   const [generating, setGenerating] = useState(false);
   const [story, setStory] = useState(null);
   const [error, setError] = useState('');
@@ -31,6 +32,7 @@ export default function StoryGenerator() {
           childName,
           childAge: parseInt(childAge),
           storyConcept,
+          language,
         }),
       });
 
@@ -49,7 +51,7 @@ export default function StoryGenerator() {
       }
 
       // Save to Supabase (with localStorage fallback)
-      await saveStory(childName, parseInt(childAge), storyConcept, data.title, data.content);
+      await saveStory(childName, parseInt(childAge), storyConcept, data.title, data.content, language);
 
       setStory(data);
     } catch (err) {
@@ -60,7 +62,7 @@ export default function StoryGenerator() {
     }
   };
 
-  const saveStory = async (childName, childAge, storyConcept, title, content) => {
+  const saveStory = async (childName, childAge, storyConcept, title, content, lang = 'en') => {
     // Try Supabase first
     try {
       const { error } = await supabase
@@ -71,6 +73,7 @@ export default function StoryGenerator() {
           story_concept: storyConcept,
           story_title: title,
           story_content: content,
+          language: lang,
           is_public: true,
         }]);
 
@@ -266,6 +269,34 @@ export default function StoryGenerator() {
               />
             </div>
 
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>🌍 Language / اللغة</label>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="language"
+                    value="en"
+                    checked={language === 'en'}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    style={{ accentColor: '#667eea' }}
+                  />
+                  <span>🇬🇧 English</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="language"
+                    value="ar"
+                    checked={language === 'ar'}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    style={{ accentColor: '#667eea' }}
+                  />
+                  <span>🇸🇦 العربية</span>
+                </label>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={generating}
@@ -275,14 +306,14 @@ export default function StoryGenerator() {
                 cursor: generating ? 'not-allowed' : 'pointer',
               }}
             >
-              {generating ? '🪄 Creating Magic...' : '✨ Generate Story'}
+              {generating ? (language === 'ar' ? '🪄 جاري إنشاء القصة...' : '🪄 Creating Magic...') : (language === 'ar' ? '✨ إنشاء القصة' : '✨ Generate Story')}
             </button>
           </form>
         ) : (
           <div>
-            <div style={styles.storyCard}>
-              <h2 style={styles.storyTitle}>{story.title}</h2>
-              <div style={styles.storyContent}>{story.content}</div>
+            <div style={{...styles.storyCard, direction: language === 'ar' ? 'rtl' : 'ltr'}}>
+              <h2 style={{...styles.storyTitle, fontFamily: language === 'ar' ? 'Arial, sans-serif' : undefined}}>{story.title}</h2>
+              <div style={{...styles.storyContent, fontFamily: language === 'ar' ? 'Arial, sans-serif' : undefined, textAlign: language === 'ar' ? 'right' : undefined}}>{story.content}</div>
             </div>
 
             <div style={{ textAlign: 'center', marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -298,19 +329,19 @@ export default function StoryGenerator() {
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 }}
               >
-                📝 Create Another Story
+                {language === 'ar' ? '📝 إنشاء قصة أخرى' : '📝 Create Another Story'}
               </button>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(`${story.title}\n\n${story.content}`);
-                  alert('Story copied to clipboard! 📋');
+                  alert(language === 'ar' ? 'تم نسخ القصة! 📋' : 'Story copied to clipboard! 📋');
                 }}
                 style={{
                   ...styles.button,
                   background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
                 }}
               >
-                📋 Copy Story
+                {language === 'ar' ? '📋 نسخ القصة' : '📋 Copy Story'}
               </button>
             </div>
           </div>
@@ -319,8 +350,15 @@ export default function StoryGenerator() {
         {generating && (
           <div style={styles.loading}>
             <div style={{ fontSize: '4rem' }}>🪄✨🌙</div>
-            <p style={styles.loadingText}>AI is creating a magical story for {childName}...</p>
-            <p style={{ fontSize: '1rem', color: '#888', marginTop: '0.5rem' }}>This takes about 5-10 seconds 🚀</p>
+            <p style={styles.loadingText}>
+              {language === 'ar' 
+                ? `الذكاء الاصطناعي ينشئ قصة سحرية لـ ${childName}...`
+                : `AI is creating a magical story for ${childName}...`
+              }
+            </p>
+            <p style={{ fontSize: '1rem', color: '#888', marginTop: '0.5rem' }}>
+              {language === 'ar' ? 'هذا يستغرق حوالي 5-10 ثواني 🚀' : 'This takes about 5-10 seconds 🚀'}
+            </p>
           </div>
         )}
       </div>

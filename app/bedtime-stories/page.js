@@ -6,6 +6,7 @@ export default function StoriesLibrary() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStory, setSelectedStory] = useState(null);
+  const [languageFilter, setLanguageFilter] = useState('all'); // 'all', 'en', 'ar'
 
   useEffect(() => {
     fetchStories();
@@ -13,14 +14,21 @@ export default function StoriesLibrary() {
 
   const fetchStories = async () => {
     setLoading(true);
-    
+
     // Try Supabase first
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('ai_stories')
         .select('*')
         .eq('is_public', true)
         .order('created_at', { ascending: false });
+      
+      // Apply language filter if selected
+      if (languageFilter !== 'all') {
+        query = query.eq('language', languageFilter);
+      }
+
+      const { data, error } = await query;
 
       if (data && !error) {
         // Transform Supabase data to match our format
@@ -31,6 +39,7 @@ export default function StoriesLibrary() {
           storyConcept: story.story_concept,
           title: story.story_title,
           content: story.story_content,
+          language: story.language || 'en',
           createdAt: story.created_at,
         }));
         setStories(formattedStories);
@@ -43,7 +52,10 @@ export default function StoriesLibrary() {
 
     // Fallback to localStorage
     const savedStories = JSON.parse(localStorage.getItem('bedtimeStories') || '[]');
-    setStories(savedStories);
+    const filteredStories = languageFilter === 'all' 
+      ? savedStories 
+      : savedStories.filter(s => (s.language || 'en') === languageFilter);
+    setStories(filteredStories);
     setLoading(false);
   };
 
@@ -204,6 +216,55 @@ export default function StoriesLibrary() {
         <div style={styles.header}>
           <h1 style={styles.title}>📚 Bedtime Stories Library</h1>
           <p style={styles.subtitle}>Magical stories created for Younis's friends! ✨</p>
+          
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => { setLanguageFilter('all'); fetchStories(); }}
+              style={{
+                padding: '0.5rem 1.25rem',
+                borderRadius: '0.75rem',
+                border: languageFilter === 'all' ? '2px solid #667eea' : '2px solid transparent',
+                background: languageFilter === 'all' ? 'rgba(102, 126, 234, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                color: 'white',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+              }}
+            >
+              🌍 All Stories
+            </button>
+            <button
+              onClick={() => { setLanguageFilter('en'); fetchStories(); }}
+              style={{
+                padding: '0.5rem 1.25rem',
+                borderRadius: '0.75rem',
+                border: languageFilter === 'en' ? '2px solid #667eea' : '2px solid transparent',
+                background: languageFilter === 'en' ? 'rgba(102, 126, 234, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                color: 'white',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+              }}
+            >
+              🇬🇧 English
+            </button>
+            <button
+              onClick={() => { setLanguageFilter('ar'); fetchStories(); }}
+              style={{
+                padding: '0.5rem 1.25rem',
+                borderRadius: '0.75rem',
+                border: languageFilter === 'ar' ? '2px solid #667eea' : '2px solid transparent',
+                background: languageFilter === 'ar' ? 'rgba(102, 126, 234, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                color: 'white',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+              }}
+            >
+              🇸🇦 العربية
+            </button>
+          </div>
+          
           <a href="/bedtime-stories/generate">
             <button style={styles.generateButton}>
               🪄 Create Your Own Story
@@ -219,51 +280,81 @@ export default function StoriesLibrary() {
           </div>
         ) : (
           <div style={styles.grid}>
-            {stories.map((story) => (
-              <div
-                key={story.id}
-                style={styles.storyCard}
-                onClick={() => setSelectedStory(story)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-5px)';
-                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(102, 126, 234, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
-                }}
-              >
-                <h3 style={styles.storyCardTitle}>{story.title || 'Untitled Story'}</h3>
-                <div style={styles.storyMeta}>
-                  <span>👶 {story.childName}</span>
-                  <span style={{ margin: '0 0.5rem' }}>•</span>
-                  <span>🎂 Age {story.childAge}</span>
+            {stories.map((story) => {
+              const isArabic = story.language === 'ar';
+              return (
+                <div
+                  key={story.id}
+                  style={{
+                    ...styles.storyCard,
+                    direction: isArabic ? 'rtl' : 'ltr',
+                    textAlign: isArabic ? 'right' : 'left',
+                  }}
+                  onClick={() => setSelectedStory(story)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(102, 126, 234, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+                  }}
+                >
+                  <h3 style={{...styles.storyCardTitle, fontFamily: isArabic ? 'Arial, sans-serif' : undefined}}>{story.title || 'Untitled Story'}</h3>
+                  <div style={styles.storyMeta}>
+                    <span>👶 {story.childName}</span>
+                    <span style={{ margin: '0 0.5rem' }}>•</span>
+                    <span>🎂 Age {story.childAge}</span>
+                    {isArabic && <span style={{ marginLeft: '0.5rem' }}>🇸🇦</span>}
+                  </div>
+                  <div style={{...styles.storyPreview, fontFamily: isArabic ? 'Arial, sans-serif' : undefined}}>{story.content}</div>
                 </div>
-                <div style={styles.storyPreview}>{story.content}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
 
       {selectedStory && (
         <div style={styles.modal} onClick={() => setSelectedStory(null)}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div 
+            style={{
+              ...styles.modalContent,
+              direction: selectedStory.language === 'ar' ? 'rtl' : 'ltr',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <button style={styles.closeButton} onClick={() => setSelectedStory(null)}>×</button>
-            <h2 style={styles.modalTitle}>{selectedStory.title || 'Magical Story'}</h2>
+            <h2 
+              style={{
+                ...styles.modalTitle,
+                fontFamily: selectedStory.language === 'ar' ? 'Arial, sans-serif' : undefined,
+              }}
+            >
+              {selectedStory.title || 'Magical Story'}
+            </h2>
             <div style={styles.modalMeta}>
-              <span>✨ A story for {selectedStory.childName}</span>
+              <span>✨ {selectedStory.language === 'ar' ? 'قصة لـ' : 'A story for'} {selectedStory.childName}</span>
               <span style={{ margin: '0 0.5rem' }}>•</span>
               <span>🎂 Age {selectedStory.childAge}</span>
               <span style={{ margin: '0 0.5rem' }}>•</span>
               <span>📅 {new Date(selectedStory.createdAt).toLocaleDateString()}</span>
+              {selectedStory.language === 'ar' && <span style={{ marginLeft: '0.5rem' }}>🇸🇦</span>}
             </div>
-            <div style={styles.modalStory}>{selectedStory.content}</div>
+            <div 
+              style={{
+                ...styles.modalStory,
+                fontFamily: selectedStory.language === 'ar' ? 'Arial, sans-serif' : undefined,
+                textAlign: selectedStory.language === 'ar' ? 'right' : undefined,
+              }}
+            >
+              {selectedStory.content}
+            </div>
             <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(`${selectedStory.title}\n\n${selectedStory.content}`);
-                  alert('Story copied to clipboard! 📋');
+                  alert(selectedStory.language === 'ar' ? 'تم نسخ القصة! 📋' : 'Story copied to clipboard! 📋');
                 }}
                 style={{
                   padding: '0.75rem 1.5rem',
@@ -275,7 +366,7 @@ export default function StoriesLibrary() {
                   fontWeight: '600',
                 }}
               >
-                📋 Copy Story
+                {selectedStory.language === 'ar' ? '📋 نسخ القصة' : '📋 Copy Story'}
               </button>
               <button
                 onClick={() => deleteStory(selectedStory.id)}
@@ -289,7 +380,7 @@ export default function StoriesLibrary() {
                   fontWeight: '600',
                 }}
               >
-                🗑️ Delete
+                {selectedStory.language === 'ar' ? '🗑️ حذف' : '🗑️ Delete'}
               </button>
             </div>
           </div>

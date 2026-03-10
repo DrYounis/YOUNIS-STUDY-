@@ -43,6 +43,7 @@ create table if not exists ai_stories (
   story_concept text not null,
   story_title text not null,
   story_content text not null,
+  language text default 'en',
   is_public boolean default true
 );
 

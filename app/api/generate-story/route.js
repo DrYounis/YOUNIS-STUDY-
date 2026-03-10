@@ -18,8 +18,8 @@ export async function POST(request) {
       );
     }
 
-    const { childName, childAge, storyConcept } = requestData;
-    console.log('📖 [STORY API] Request:', { childName, childAge, storyConcept: storyConcept?.substring(0, 50) });
+    const { childName, childAge, storyConcept, language = 'en' } = requestData;
+    console.log('📖 [STORY API] Request:', { childName, childAge, storyConcept: storyConcept?.substring(0, 50), language });
 
     if (!childName || !childAge || !storyConcept) {
       return NextResponse.json(
@@ -34,7 +34,7 @@ export async function POST(request) {
     if (apiKey) {
       console.log('✅ [STORY API] Using DeepSeek AI');
       try {
-        const storyData = await generateWithDeepSeek(childName, childAge, storyConcept, apiKey);
+        const storyData = await generateWithDeepSeek(childName, childAge, storyConcept, apiKey, language);
         if (storyData && storyData.title && storyData.content) {
           console.log('📦 [STORY API] AI Generated story:', { title: storyData.title, contentLength: storyData.content.length });
           return NextResponse.json(storyData);
@@ -50,7 +50,7 @@ export async function POST(request) {
 
     // Fallback to template
     console.log('✅ [STORY API] Using template story generator');
-    const storyData = generateTemplateStory(childName, childAge, storyConcept);
+    const storyData = generateTemplateStory(childName, childAge, storyConcept, language);
     console.log('📦 [STORY API] Template story:', { title: storyData.title, contentLength: storyData.content.length });
     
     return NextResponse.json(storyData);
@@ -68,8 +68,27 @@ export async function POST(request) {
 }
 
 // Generate story with DeepSeek AI
-async function generateWithDeepSeek(name, age, concept, apiKey) {
-  const prompt = `Write a magical bedtime story for a ${age}-year-old child named ${name}.
+async function generateWithDeepSeek(name, age, concept, apiKey, language = 'en') {
+  const isArabic = language === 'ar';
+  
+  const prompt = isArabic
+    ? `اكتب قصة سحرية قبل النوم لطفل/طفلة عمره ${age} سنوات اسمه/ها ${name}.
+
+مفهوم/موضوع القصة: ${concept}
+
+المتطلبات:
+- اجعل القصة دافئة ومريحة ومناسبة لعمر ${age} سنوات
+- ضمّن اسم الطفل "${name}" كشخصية رئيسية (استخدمه 3-5 مرات)
+- اجعل القصة حوالي 300-400 كلمة (مثالية للقراءة قبل النوم)
+- ضمّن رسالة أخلاقية لطيفة أو رسالة إيجابية
+- استخدم لغة بسيطة وجذابة يفهمها طفل عمره ${age} سنوات
+- اختم بنهاية هادئة تساعد على الاسترخاء والنوم
+- أضف بعض الإيموجي لجعل القصة ممتعة (لكن لا تكثر منها)
+- ابتكر عنوانًا جذابًا
+
+استجب فقط بكائن JSON بالتنسيق الدقيق التالي:
+{"title": "عنوان القصة هنا", "content": "نص القصة الكامل مع فقرات مفصولة بـ \\n\\n"}`
+    : `Write a magical bedtime story for a ${age}-year-old child named ${name}.
 
 Story concept/theme: ${concept}
 
@@ -97,7 +116,9 @@ Respond with ONLY a JSON object in this exact format:
       messages: [
         {
           role: 'system',
-          content: 'You are a wonderful children\'s bedtime story writer. You create magical, comforting, and age-appropriate stories that help children feel safe, loved, and ready for sleep. You always include the child\'s name and make them the hero of their own adventure. Your stories have gentle morals and peaceful endings. Always respond with valid JSON.'
+          content: isArabic
+            ? 'أنت كاتب قصص أطفال رائع. تنشئ قصصًا سحرية ومريحة ومناسبة للعمر تساعد الأطفال على الشعور بالأمان والحب والاستعداد للنوم. دائمًا ضمّن اسم الطفل واجعله بطل المغامرة. قصصك تحتوي على رسائل أخلاقية لطيفة ونهايات هادئة. استجب دائمًا بـ JSON صالح.'
+            : 'You are a wonderful children\'s bedtime story writer. You create magical, comforting, and age-appropriate stories that help children feel safe, loved, and ready for sleep. You always include the child\'s name and make them the hero of their own adventure. Your stories have gentle morals and peaceful endings. Always respond with valid JSON.'
         },
         {
           role: 'user',
@@ -137,9 +158,30 @@ Respond with ONLY a JSON object in this exact format:
 }
 
 // Fallback template generator (when API is unavailable)
-function generateTemplateStory(name, age, concept) {
-  const capitalizedConcept = concept.charAt(0).toUpperCase() + concept.slice(1);
+function generateTemplateStory(name, age, concept, language = 'en') {
+  const isArabic = language === 'ar';
   
+  if (isArabic) {
+    return {
+      title: `🌟 مغامرة ${name} السحرية`,
+      content: `في قديم الزمان، في منزل صغير مريح تمامًا مثل منزلك، عاش مغامر شجاع يبلغ من العمر ${age} سنوات اسمه ${name}. 🏠✨
+
+في إحدى الأمسيات الهادئة، اكتشف ${name} شيئًا سحريًا عن: ${concept}. كان الأمر مثل العثور على كنز سري! 💎
+
+أغلق ${name} عينيه وتخيل أنه يطفو على سحابة ناعمة ☁️، ينزلق عبر سماء مليئة بالنجوم اللامعة ⭐. كل نجمة كانت تهمس بكلمات طيبة: "أنت شجاع يا ${name}!" "أنت طيب!" "أنت مميز!"
+
+بينما سافر ${name} عبر هذه الأرض الحالمة، التقى بشخصيات ودية تحب ${concept} تمامًا كما يحبها! معًا، تعلموا أن أكثر شيء سحري في الكون كله هو... الإيمان بنفسك! 🌈
+
+ابتسمت القمر وأنشأت أغنية هادئة 🌙🎵. شعر ${name} بالدفء والأمان والنعاس الشديد...
+
+وعندما أثقلت عيون ${name}، عرفوا أن الغد سيحمل مغامرات جديدة. لكن الآن، حان الوقت للراحة والأحلام الحلوة. 💤
+
+تصبح على خير، يا ${name} الشجاع. النهاية. 🌟`
+    };
+  }
+  
+  const capitalizedConcept = concept.charAt(0).toUpperCase() + concept.slice(1);
+
   return {
     title: `🌟 ${name}'s Magical ${capitalizedConcept} Adventure`,
     content: `Once upon a time, in a cozy little house just like yours, lived a brave ${age}-year-old adventurer named ${name}. 🏠✨

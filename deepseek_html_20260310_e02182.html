@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Kids A4 Drawing Paper Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            text-shadow: 3px 3px 0px #4834d4;
+            margin-bottom: 30px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .generator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .generator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .controls-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+        
+        .control-group h3 {
+            color: #4834d4;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        select, input[type="text"], input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            transform: scale(1.02);
+        }
+        
+        .preview-panel {
+            text-align: center;
+        }
+        
+        #paperCanvas {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border: 5px solid #4834d4;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            background: white;
+            margin-bottom: 15px;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .secondary-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 16px;
+            padding: 12px;
+        }
+        
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .preset-btn {
+            background: #e0e0e0;
+            color: #333;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+            flex: 1;
+        }
+        
+        .preset-btn:hover {
+            background: #4834d4;
+            color: white;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Kids Drawing Paper Generator 🖍️</h1>
+        
+        <div class="tool-card">
+            <div class="generator-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <h3>Choose Your Theme</h3>
+                        <div class="preset-buttons">
+                            <button class="preset-btn" onclick="setPreset('animal')">🐶 Animals</button>
+                            <button class="preset-btn" onclick="setPreset('vehicle')">🚗 Vehicles</button>
+                            <button class="preset-btn" onclick="setPreset('nature')">🌳 Nature</button>
+                            <button class="preset-btn" onclick="setPreset('fantasy')">🦄 Fantasy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3>Custom Drawing</h3>
+                        <label>What to draw?</label>
+                        <input type="text" id="drawingSubject" placeholder="e.g., happy dinosaur, butterfly, rocket ship..." value="happy dinosaur">
+                        
+                        <label>Style</label>
+                        <select id="drawingStyle">
+                            <option value="simple">Simple (Ages 2-4)</option>
+                            <option value="medium" selected>Medium (Ages 4-6)</option>
+                            <option value="detailed">Detailed (Ages 6-8)</option>
+                        </select>
+                        
+                        <label>Line Thickness</label>
+                        <input type="range" id="lineThickness" min="2" max="10" value="4" step="1">
+                        <span id="thicknessValue">4px</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3>Extras</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="addTracing" checked>
+                            <label for="addTracing">Add tracing lines</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="addBorder">
+                            <label for="addBorder">Add decorative border</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="addInstructions">
+                            <label for="addInstructions">Show instructions</label>
+                        </div>
+                    </div>
+                    
+                    <button onclick="generateDrawing()">✨ Generate Drawing Paper ✨</button>
+                </div>
+                
+                <div class="preview-panel">
+                    <canvas id="paperCanvas" width="600" height="800"></canvas>
+                    
+                    <div class="action-buttons">
+                        <button class="secondary-btn" onclick="downloadPDF()">📥 Download PDF</button>
+                        <button class="secondary-btn" onclick="printPaper()">🖨️ Print</button>
+                    </div>
+                    
+                    <button class="secondary-btn" onclick="randomGenerate()" style="margin-top: 10px;">🎲 Surprise Me!</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            ⭐ Click generate to create a new drawing page! ⭐
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const canvas = document.getElementById('paperCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Simple drawing templates (in real app, you'd use an AI API)
+        const templates = {
+            animal: ['🐶 dog', '🐱 cat', '🐰 bunny', '🐘 elephant', '🦒 giraffe'],
+            vehicle: ['🚗 car', '🚜 tractor', '✈️ airplane', '🚂 train', '🚲 bicycle'],
+            nature: ['🌳 tree', '🌻 sunflower', '🌈 rainbow', '☁️ cloud', '🐞 ladybug'],
+            fantasy: ['🦄 unicorn', '🐉 dragon', '🧚 fairy', '🏰 castle', '👑 crown']
+        };
+        
+        function setPreset(category) {
+            const items = templates[category];
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            document.getElementById('drawingSubject').value = randomItem;
+            generateDrawing();
+        }
+        
+        function updateThicknessLabel() {
+            const thickness = document.getElementById('lineThickness').value;
+            document.getElementById('thicknessValue').textContent = thickness + 'px';
+        }
+        
+        document.getElementById('lineThickness').addEventListener('input', updateThicknessLabel);
+        
+        function generateDrawing() {
+            const subject = document.getElementById('drawingSubject').value || 'happy animal';
+            const style = document.getElementById('drawingStyle').value;
+            const thickness = parseInt(document.getElementById('lineThickness').value);
+            const addTracing = document.getElementById('addTracing').checked;
+            const addBorder = document.getElementById('addBorder').checked;
+            const addInstructions = document.getElementById('addInstructions').checked;
+            
+            // Clear canvas
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Set line style
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = thickness;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Draw A4 border (guides)
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+            
+            // Draw main content based on subject
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = thickness;
+            
+            // Simple drawing generator based on keywords
+            const subject_lower = subject.toLowerCase();
+            
+            // Draw a simple dinosaur (default)
+            if (subject_lower.includes('dinosaur') || subject_lower.includes('dino')) {
+                drawDinosaur(200, 300);
+            }
+            // Draw a simple dog
+            else if (subject_lower.includes('dog') || subject_lower.includes('puppy')) {
+                drawDog(250, 300);
+            }
+            // Draw a simple cat
+            else if (subject_lower.includes('cat') || subject_lower.includes('kitty')) {
+                drawCat(250, 300);
+            }
+            // Draw a simple car
+            else if (subject_lower.includes('car') || subject_lower.includes('truck') || subject_lower.includes('vehicle')) {
+                drawCar(200, 350);
+            }
+            // Draw a simple butterfly
+            else if (subject_lower.includes('butterfly')) {
+                drawButterfly(300, 250);
+            }
+            // Draw a simple flower
+            else if (subject_lower.includes('flower') || subject_lower.includes('sunflower')) {
+                drawFlower(300, 300);
+            }
+            // Draw a simple tree
+            else if (subject_lower.includes('tree')) {
+                drawTree(300, 250);
+            }
+            // Default - draw a happy sun
+            else {
+                drawSun(300, 200);
+                if (subject_lower.includes('animal')) {
+                    drawSimpleAnimal(250, 400);
+                }
+            }
+            
+            // Add tracing lines if selected
+            if (addTracing) {
+                ctx.strokeStyle = '#ccc';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                
+                // Copy the main drawing with dashed lines
+                if (subject_lower.includes('dinosaur')) {
+                    drawDinosaur(200, 300, true);
+                } else if (subject_lower.includes('dog')) {
+                    drawDog(250, 300, true);
+                } else if (subject_lower.includes('cat')) {
+                    drawCat(250, 300, true);
+                }
+                
+                ctx.setLineDash([]);
+            }
+            
+            // Add decorative border
+            if (addBorder) {
+                ctx.strokeStyle = '#4834d4';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([]);
+                
+                // Draw simple border patterns
+                for (let i = 30; i < canvas.width - 30; i += 40) {
+                    ctx.beginPath();
+                    ctx.arc(i, 30, 5, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#ff6b6b';
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.arc(i, canvas.height - 30, 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+            
+            // Add instructions
+            if (addInstructions) {
+                ctx.fillStyle = '#666';
+                ctx.font = '16px "Comic Sans MS", Arial, sans-serif';
+                ctx.fillText('🖍️ Color me!', 50, 100);
+                ctx.fillText('✏️ Draw carefully!', 400, 100);
+            }
+            
+            // Add title
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 20px "Comic Sans MS", Arial, sans-serif';
+            ctx.fillText('Let\'s draw a ' + subject + '!', 200, 70);
+            
+            // Add name line
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(400, 750);
+            ctx.lineTo(550, 750);
+            ctx.stroke();
+            ctx.fillStyle = '#999';
+            ctx.font = '14px Arial';
+            ctx.fillText('Your name:', 300, 760);
+        }
+        
+        // Drawing helper functions
+        function drawDinosaur(x, y, isTracing = false) {
+            ctx.beginPath();
+            // Body
+            ctx.moveTo(x, y);
+            ctx.quadraticCurveTo(x + 100, y - 50, x + 200, y);
+            ctx.lineTo(x + 180, y + 80);
+            ctx.quadraticCurveTo(x + 100, y + 30, x, y + 80);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(x + 200, y - 20, 40, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Eye
+            ctx.beginPath();
+            ctx.arc(x + 215, y - 35, 5, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Spikes
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x + 50 + i * 40, y - 20);
+                ctx.lineTo(x + 70 + i * 40, y - 60);
+                ctx.lineTo(x + 90 + i * 40, y - 20);
+                ctx.stroke();
+            }
+        }
+        
+        function drawDog(x, y, isTracing = false) {
+            // Head
+            ctx.beginPath();
+            ctx.arc(x + 150, y, 50, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Ears
+            ctx.beginPath();
+            ctx.ellipse(x + 120, y - 40, 15, 25, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(x + 180, y - 40, 15, 25, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Eyes
+            ctx.beginPath();
+            ctx.arc(x + 130, y - 15, 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + 170, y - 15, 5, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Nose
+            ctx.beginPath();
+            ctx.arc(x + 150, y + 10, 8, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Body
+            ctx.beginPath();
+            ctx.ellipse(x + 150, y + 80, 80, 40, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Legs
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x + 100 + i * 35, y + 60);
+                ctx.lineTo(x + 100 + i * 35, y + 120);
+                ctx.stroke();
+            }
+        }
+        
+        function drawCat(x, y, isTracing = false) {
+            // Similar to dog but with pointy ears
+            ctx.beginPath();
+            ctx.arc(x + 150, y, 45, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Pointy ears
+            ctx.beginPath();
+            ctx.moveTo(x + 120, y - 35);
+            ctx.lineTo(x + 100, y - 70);
+            ctx.lineTo(x + 140, y - 50);
+            ctx.closePath();
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(x + 180, y - 35);
+            ctx.lineTo(x + 200, y - 70);
+            ctx.lineTo(x + 160, y - 50);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Eyes
+            ctx.beginPath();
+            ctx.arc(x + 130, y - 15, 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + 170, y - 15, 5, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Whiskers
+            ctx.beginPath();
+            ctx.moveTo(x + 130, y);
+            ctx.lineTo(x + 100, y - 10);
+            ctx.moveTo(x + 130, y);
+            ctx.lineTo(x + 100, y + 10);
+            ctx.moveTo(x + 170, y);
+            ctx.lineTo(x + 200, y - 10);
+            ctx.moveTo(x + 170, y);
+            ctx.lineTo(x + 200, y + 10);
+            ctx.stroke();
+        }
+        
+        function drawCar(x, y) {
+            // Body
+            ctx.beginPath();
+            ctx.rect(x, y, 300, 100);
+            ctx.stroke();
+            
+            // Roof
+            ctx.beginPath();
+            ctx.rect(x + 50, y - 50, 150, 50);
+            ctx.stroke();
+            
+            // Windows
+            ctx.beginPath();
+            ctx.rect(x + 70, y - 40, 40, 30);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.rect(x + 140, y - 40, 40, 30);
+            ctx.stroke();
+            
+            // Wheels
+            ctx.beginPath();
+            ctx.arc(x + 70, y + 100, 30, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + 230, y + 100, 30, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        function drawButterfly(x, y) {
+            // Body
+            ctx.beginPath();
+            ctx.ellipse(x, y, 20, 60, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Left wing
+            ctx.beginPath();
+            ctx.ellipse(x - 50, y - 20, 60, 40, -0.3, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Right wing
+            ctx.beginPath();
+            ctx.ellipse(x + 50, y - 20, 60, 40, 0.3, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Bottom wings
+            ctx.beginPath();
+            ctx.ellipse(x - 40, y + 30, 40, 30, 0.2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(x + 40, y + 30, 40, 30, -0.2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        function drawFlower(x, y) {
+            // Stem
+            ctx.beginPath();
+            ctx.moveTo(x + 100, y + 100);
+            ctx.lineTo(x + 100, y + 200);
+            ctx.stroke();
+            
+            // Leaves
+            ctx.beginPath();
+            ctx.ellipse(x + 100, y + 150, 15, 30, -0.3, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(x + 100, y + 180, 15, 30, 0.3, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Flower head
+            for (let i = 0; i < 6; i++) {
+                ctx.beginPath();
+                ctx.ellipse(x + 100 + 30 * Math.cos(i * Math.PI/3), 
+                           y + 70 + 30 * Math.sin(i * Math.PI/3), 
+                           20, 20, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Center
+            ctx.beginPath();
+            ctx.arc(x + 100, y + 70, 20, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        function drawTree(x, y) {
+            // Trunk
+            ctx.beginPath();
+            ctx.rect(x - 20, y + 100, 40, 150);
+            ctx.stroke();
+            
+            // Leaves (simple circles)
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.arc(x + 20 * Math.cos(i * 1.2), 
+                       y + 50 + 30 * Math.sin(i * 1.2), 
+                       40, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+        
+        function drawSun(x, y) {
+            // Sun circle
+            ctx.beginPath();
+            ctx.arc(x, y, 60, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Rays
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x + 80 * Math.cos(i * Math.PI/4), 
+                          y + 80 * Math.sin(i * Math.PI/4));
+                ctx.lineTo(x + 110 * Math.cos(i * Math.PI/4), 
+                          y + 110 * Math.sin(i * Math.PI/4));
+                ctx.stroke();
+            }
+        }
+        
+        function drawSimpleAnimal(x, y) {
+            // Simple round animal
+            ctx.beginPath();
+            ctx.arc(x, y, 80, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Ears
+            ctx.beginPath();
+            ctx.arc(x - 40, y - 50, 25, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + 40, y - 50, 25, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Eyes
+            ctx.beginPath();
+            ctx.arc(x - 30, y - 20, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + 30, y - 20, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Nose
+            ctx.beginPath();
+            ctx.arc(x, y + 20, 10, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        function randomGenerate() {
+            const categories = ['animal', 'vehicle', 'nature', 'fantasy'];
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            setPreset(randomCat);
+        }
+        
+        function downloadPDF() {
+            const canvas = document.getElementById('paperCanvas');
+            
+            // Convert canvas to image
+            const imgData = canvas.toDataURL('image/png');
+            
+            // Create PDF (A4 size: 210mm x 297mm)
+            const pdf = new jspdf.jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            // Calculate dimensions to fit A4
+            const imgWidth = 210;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            pdf.save('kids-drawing.pdf');
+        }
+        
+        function printPaper() {
+            window.print();
+        }
+        
+        // Initialize with a default drawing
+        window.onload = function() {
+            updateThicknessLabel();
+            generateDrawing();
+        };
+    </script>
+</body>
+</html>
