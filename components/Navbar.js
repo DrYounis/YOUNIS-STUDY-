@@ -30,10 +30,10 @@ export default function Navbar() {
             padding: '1rem 2rem',
         },
         logo: {
-            fontSize: '2rem',
-            fontWeight: '800',
+            fontSize: '3rem',
+            fontWeight: '900',
             color: 'white',
-            textShadow: '3px 3px 0px rgba(0,0,0,0.3)',
+            textShadow: '4px 4px 0px rgba(0,0,0,0.4)',
             textDecoration: 'none',
         },
         links: {
@@ -43,12 +43,12 @@ export default function Navbar() {
             alignItems: 'center',
         },
         link: {
-            fontWeight: '700',
-            fontSize: '1.1rem',
+            fontWeight: '800',
+            fontSize: '1.4rem',
             color: 'rgba(255,255,255,0.95)',
             textDecoration: 'none',
-            padding: '0.5rem 1rem',
-            borderRadius: '10px',
+            padding: '0.7rem 1.3rem',
+            borderRadius: '12px',
             transition: 'all 0.3s ease',
             background: 'rgba(255,255,255,0.1)',
             backdropFilter: 'blur(10px)',
@@ -89,15 +89,12 @@ export default function Navbar() {
                 {/* Desktop Nav */}
                 <div className="desktop-nav" style={navStyles.links}>
                     <Link href="/" style={navStyles.link}>🏠 Home</Link>
-                    <Link href="/fun-zone" style={{...navStyles.link, background: 'rgba(255,255,255,0.25)', fontWeight: '800'}}>🎉 Fun Zone</Link>
-                    <Link href="/citizens" style={navStyles.link}>🏆 Citizens</Link>
-                    <Link href="/secret-box" style={navStyles.link}>🔐 Secret</Link>
-                    <Link href="/kids-tools" style={navStyles.link}>🎨 Kids Tools</Link>
-                    <Link href="/coloring-book" style={navStyles.link}>📚 Coloring Book</Link>
-                    <Link href="/bedtime-stories" style={navStyles.link}>📚 Stories</Link>
-                    <Link href="/friends" style={navStyles.link}>💌 Friends</Link>
+                    <Link href="/fun-zone" style={{...navStyles.link, background: 'rgba(255,255,255,0.25)', fontWeight: '900'}}>🎉 Fun Zone</Link>
                     <Link href="/videos" style={navStyles.link}>🎬 Videos</Link>
                     <Link href="/gallery" style={navStyles.link}>🖼️ Gallery</Link>
+                    <Link href="/diaries" style={navStyles.link}>📖 Diaries</Link>
+                    <Link href="/friends" style={navStyles.link}>👫 Friends</Link>
+                    <Link href="/about" style={navStyles.link}>ℹ️ About</Link>
                 </div>
 
                 {/* Mobile Toggle */}
@@ -107,16 +104,13 @@ export default function Navbar() {
 
                 {/* Mobile Nav */}
                 <div style={navStyles.mobileMenu}>
-                    <Link href="/" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>🏠 Home</Link>
-                    <Link href="/fun-zone" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center', background: 'rgba(255,255,255,0.25)' }}>🎉 Fun Zone</Link>
-                    <Link href="/citizens" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>🏆 Citizens</Link>
-                    <Link href="/secret-box" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>🔐 Secret Box</Link>
-                    <Link href="/kids-tools" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>🎨 Kids Tools</Link>
-                    <Link href="/coloring-book" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>📚 Coloring Book</Link>
-                    <Link href="/bedtime-stories" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>📚 Stories</Link>
-                    <Link href="/friends" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>💌 Friends</Link>
-                    <Link href="/videos" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>🎬 Videos</Link>
-                    <Link href="/gallery" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.3rem', textAlign: 'center' }}>🖼️ Gallery</Link>
+                    <Link href="/" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.6rem', textAlign: 'center' }}>🏠 Home</Link>
+                    <Link href="/fun-zone" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.6rem', textAlign: 'center', background: 'rgba(255,255,255,0.25)' }}>🎉 Fun Zone</Link>
+                    <Link href="/videos" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.6rem', textAlign: 'center' }}>🎬 Videos</Link>
+                    <Link href="/gallery" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.6rem', textAlign: 'center' }}>🖼️ Gallery</Link>
+                    <Link href="/diaries" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.6rem', textAlign: 'center' }}>📖 Diaries</Link>
+                    <Link href="/friends" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.6rem', textAlign: 'center' }}>👫 Friends</Link>
+                    <Link href="/about" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.6rem', textAlign: 'center' }}>ℹ️ About</Link>
                 </div>
             </div>
             <style jsx>{`

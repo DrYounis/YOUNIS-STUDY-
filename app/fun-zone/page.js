@@ -4,6 +4,14 @@ import Link from 'next/link';
 export default function FunZone() {
   const activities = [
     {
+      title: '🌙 أغنية العيد',
+      description: 'أنشئ أغنية خليجية احتفالية لعيد الفطر باسم طفلك! أغنية مرحة باللهجة الخليجية!',
+      href: '/fun-zone/eid-song',
+      color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      icon: '🎵',
+      features: ['أغنية خليجية', 'اسم الطفل', 'كلمات احتفالية', 'جاهزة للطباعة']
+    },
+    {
       title: '🌟 مواطنو عالم يونس',
       description: 'كن مواطناً مميزاً! احصل على وسام رقمي خاص بك وشارك رسوماتك!',
       href: '/citizens',
