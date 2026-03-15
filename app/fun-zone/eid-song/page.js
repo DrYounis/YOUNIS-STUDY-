@@ -13,6 +13,17 @@ export default function EidSongGenerator() {
   const [audioUrl, setAudioUrl] = useState(null);
   const audioRef = useRef(null);
   const synthRef = useRef(null);
+  
+  // Save feature states
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [parentName, setParentName] = useState('');
+  const [parentEmail, setParentEmail] = useState('');
+  const [parentPhone, setParentPhone] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState(null);
+  const [savedSongs, setSavedSongs] = useState([]);
+  const [showSavedSongs, setShowSavedSongs] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   const generateSong = async (e) => {
     e.preventDefault();
@@ -132,6 +143,90 @@ export default function EidSongGenerator() {
       synthRef.current.cancel();
     }
     setIsPlaying(false);
+  };
+
+  // Save song function
+  const saveSong = async (e) => {
+    e.preventDefault();
+    
+    if (!parentName || !parentEmail || !childName || !song) {
+      setSaveMessage({ type: 'error', text: 'Please fill in all required fields' });
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage(null);
+
+    try {
+      const response = await fetch('/api/save-eid-song', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parentName,
+          parentEmail,
+          parentPhone,
+          childName,
+          songTitle: song.title,
+          songLyrics: song.lyrics,
+          language
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save song');
+      }
+
+      setSaveMessage({ type: 'success', text: '✅ Song saved successfully! You can access it anytime.' });
+      
+      // Clear form after successful save
+      setTimeout(() => {
+        setShowSaveModal(false);
+        setSaveMessage(null);
+      }, 2000);
+    } catch (err) {
+      console.error('Save error:', err);
+      setSaveMessage({ type: 'error', text: 'Failed to save. Please try again.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Load user's saved songs
+  const loadSavedSongs = async () => {
+    if (!userEmail) {
+      setError('Please enter your email');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/save-eid-song?email=${encodeURIComponent(userEmail)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load songs');
+      }
+
+      setSavedSongs(data.songs || []);
+      setShowSavedSongs(true);
+    } catch (err) {
+      console.error('Load error:', err);
+      setError('Failed to load saved songs');
+    }
+  };
+
+  // Delete a saved song
+  const deleteSong = async (songId) => {
+    if (!confirm('Are you sure you want to delete this song?')) return;
+
+    try {
+      // Note: You may want to add a DELETE endpoint to the API
+      // For now, we'll just remove it from the local state
+      setSavedSongs(savedSongs.filter(s => s.id !== songId));
+    } catch (err) {
+      console.error('Delete error:', err);
+    }
   };
 
   useEffect(() => {
@@ -328,6 +423,109 @@ export default function EidSongGenerator() {
       fontSize: '1.1rem',
       lineHeight: '1.6',
     },
+    modalOverlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0, 0, 0, 0.7)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 2000,
+      padding: '1rem',
+    },
+    modal: {
+      background: 'white',
+      borderRadius: '25px',
+      padding: '2.5rem',
+      maxWidth: '500px',
+      width: '100%',
+      maxHeight: '90vh',
+      overflow: 'auto',
+      position: 'relative',
+      boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+    },
+    closeButton: {
+      position: 'absolute',
+      top: '15px',
+      right: '15px',
+      background: 'rgba(240, 147, 251, 0.2)',
+      border: 'none',
+      borderRadius: '50%',
+      width: '40px',
+      height: '40px',
+      fontSize: '1.5rem',
+      cursor: 'pointer',
+      color: '#f5576c',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      transition: 'all 0.3s ease',
+    },
+    modalTitle: {
+      fontSize: '2rem',
+      fontWeight: 'bold',
+      color: '#333',
+      textAlign: 'center',
+      marginBottom: '0.5rem',
+    },
+    modalSubtitle: {
+      fontSize: '1rem',
+      color: '#666',
+      textAlign: 'center',
+      marginBottom: '2rem',
+    },
+    saveMessage: {
+      padding: '15px 20px',
+      borderRadius: '15px',
+      fontSize: '1rem',
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    savedSongsEmpty: {
+      textAlign: 'center',
+      padding: '2rem',
+    },
+    savedSongsList: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1rem',
+      maxHeight: '500px',
+      overflow: 'auto',
+    },
+    savedSongCard: {
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      borderRadius: '15px',
+      padding: '1.5rem',
+      border: '2px solid #667eea',
+    },
+    savedSongTitle: {
+      fontSize: '1.2rem',
+      fontWeight: 'bold',
+      color: '#333',
+      marginBottom: '0.5rem',
+    },
+    savedSongInfo: {
+      fontSize: '0.95rem',
+      color: '#666',
+      marginBottom: '1rem',
+    },
+    savedSongActions: {
+      display: 'flex',
+      gap: '0.5rem',
+    },
+    smallButton: {
+      padding: '8px 16px',
+      fontSize: '0.95rem',
+      fontWeight: 'bold',
+      color: 'white',
+      border: 'none',
+      borderRadius: '20px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+    },
   };
 
   return (
@@ -482,7 +680,7 @@ export default function EidSongGenerator() {
                   disabled={isGeneratingAudio}
                   style={{
                     ...styles.actionButton,
-                    background: isPlaying 
+                    background: isPlaying
                       ? 'linear-gradient(135deg, #f5576c 0%, #d63031 100%)'
                       : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
@@ -501,6 +699,42 @@ export default function EidSongGenerator() {
                   }}
                 >
                   {isGeneratingAudio ? '⏳ جاري...' : isPlaying ? '⏹️ إيقاف' : '🔊 تشغيل الأغنية'}
+                </button>
+                <button
+                  onClick={() => setShowSaveModal(true)}
+                  style={{
+                    ...styles.actionButton,
+                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    color: 'white',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 5px 15px rgba(240, 147, 251, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  💾 حفظ الأغنية
+                </button>
+                <button
+                  onClick={() => setShowSavedSongs(true)}
+                  style={{
+                    ...styles.actionButton,
+                    background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                    color: 'white',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 5px 15px rgba(79, 172, 254, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  📚 أغاني المحفوظة
                 </button>
                 <button
                   onClick={handlePrint}
@@ -549,6 +783,147 @@ export default function EidSongGenerator() {
                   🎵 أغنية جديدة
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Save Modal */}
+        {showSaveModal && (
+          <div style={styles.modalOverlay} className="no-print">
+            <div style={styles.modal}>
+              <button
+                onClick={() => setShowSaveModal(false)}
+                style={styles.closeButton}
+              >
+                ✕
+              </button>
+              <h3 style={styles.modalTitle}>💾 حفظ الأغنية</h3>
+              <p style={styles.modalSubtitle}>أدخل معلوماتك لحفظ الأغنية والوصول إليها لاحقاً</p>
+              
+              <form onSubmit={saveSong} style={styles.form}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>👤 اسم الوالد/الوالدة *</label>
+                  <input
+                    type="text"
+                    value={parentName}
+                    onChange={(e) => setParentName(e.target.value)}
+                    placeholder="مثال: أحمد محمد"
+                    style={styles.input}
+                    dir="rtl"
+                    required
+                  />
+                </div>
+
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>📧 البريد الإلكتروني *</label>
+                  <input
+                    type="email"
+                    value={parentEmail}
+                    onChange={(e) => setParentEmail(e.target.value)}
+                    placeholder="example@email.com"
+                    style={styles.input}
+                    dir="ltr"
+                    required
+                  />
+                </div>
+
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>📱 رقم الهاتف (اختياري)</label>
+                  <input
+                    type="tel"
+                    value={parentPhone}
+                    onChange={(e) => setParentPhone(e.target.value)}
+                    placeholder="+966 5X XXX XXXX"
+                    style={styles.input}
+                    dir="ltr"
+                  />
+                </div>
+
+                {saveMessage && (
+                  <div style={{
+                    ...styles.saveMessage,
+                    background: saveMessage.type === 'success' ? '#d4edda' : '#f8d7da',
+                    color: saveMessage.type === 'success' ? '#155724' : '#721c24',
+                  }}>
+                    {saveMessage.text}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  style={{
+                    ...styles.button,
+                    opacity: isSaving ? 0.7 : 1,
+                    cursor: isSaving ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {isSaving ? '⏳ جاري الحفظ...' : '💾 حفظ الأغنية'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Saved Songs Modal */}
+        {showSavedSongs && (
+          <div style={styles.modalOverlay} className="no-print">
+            <div style={{...styles.modal, maxWidth: '700px'}}>
+              <button
+                onClick={() => setShowSavedSongs(false)}
+                style={styles.closeButton}
+              >
+                ✕
+              </button>
+              <h3 style={styles.modalTitle}>📚 أغاني المحفوظة</h3>
+              
+              {!savedSongs.length ? (
+                <div style={styles.savedSongsEmpty}>
+                  <p>أدخل بريدك الإلكتروني لعرض أغانيك المحفوظة</p>
+                  <div style={styles.inputGroup}>
+                    <input
+                      type="email"
+                      value={userEmail}
+                      onChange={(e) => setUserEmail(e.target.value)}
+                      placeholder="example@email.com"
+                      style={{...styles.input, textAlign: 'left'}}
+                      dir="ltr"
+                    />
+                  </div>
+                  <button onClick={loadSavedSongs} style={styles.button}>
+                    🔍 عرض الأغاني
+                  </button>
+                </div>
+              ) : (
+                <div style={styles.savedSongsList}>
+                  {savedSongs.map((savedSong) => (
+                    <div key={savedSong.id} style={styles.savedSongCard}>
+                      <h4 style={styles.savedSongTitle}>{savedSong.song_title}</h4>
+                      <p style={styles.savedSongInfo}>
+                        👦 {savedSong.child_name} | 📅 {new Date(savedSong.created_at).toLocaleDateString('ar-SA')}
+                      </p>
+                      <div style={styles.savedSongActions}>
+                        <button
+                          onClick={() => {
+                            setSong({ title: savedSong.song_title, lyrics: savedSong.song_lyrics });
+                            setChildName(savedSong.child_name);
+                            setShowSavedSongs(false);
+                          }}
+                          style={{...styles.smallButton, background: '#667eea'}}
+                        >
+                          👁️ عرض
+                        </button>
+                        <button
+                          onClick={() => deleteSong(savedSong.id)}
+                          style={{...styles.smallButton, background: '#f5576c'}}
+                        >
+                          🗑️ حذف
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
