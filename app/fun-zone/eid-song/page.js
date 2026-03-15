@@ -44,12 +44,14 @@ export default function EidSongGenerator() {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'فشل في إنشاء الأغنية');
       }
 
-      setSong(data);
+      // Convert escaped newlines to actual newlines
+      const formattedLyrics = data.lyrics.replace(/\\n/g, '\n');
+      setSong({ ...data, lyrics: formattedLyrics });
     } catch (err) {
       console.error('Error generating song:', err);
       setError('حدث خطأ أثناء إنشاء الأغنية. يرجى المحاولة مرة أخرى.');
@@ -167,7 +169,7 @@ export default function EidSongGenerator() {
           parentPhone,
           childName,
           songTitle: song.title,
-          songLyrics: song.lyrics,
+          songLyrics: song.lyrics, // Already formatted with real newlines
           language
         }),
       });
@@ -179,7 +181,7 @@ export default function EidSongGenerator() {
       }
 
       setSaveMessage({ type: 'success', text: '✅ Song saved successfully! You can access it anytime.' });
-      
+
       // Clear form after successful save
       setTimeout(() => {
         setShowSaveModal(false);
@@ -906,7 +908,9 @@ export default function EidSongGenerator() {
                       <div style={styles.savedSongActions}>
                         <button
                           onClick={() => {
-                            setSong({ title: savedSong.song_title, lyrics: savedSong.song_lyrics });
+                            // Convert escaped newlines to actual newlines
+                            const formattedLyrics = savedSong.song_lyrics.replace(/\\n/g, '\n');
+                            setSong({ title: savedSong.song_title, lyrics: formattedLyrics });
                             setChildName(savedSong.child_name);
                             setShowSavedSongs(false);
                           }}

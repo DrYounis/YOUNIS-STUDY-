@@ -24,33 +24,19 @@ create table if not exists eid_songs (
 -- Enable Row Level Security (RLS)
 alter table eid_songs enable row level security;
 
--- Policy: Users can read their own songs (based on email)
-create policy "Enable read access for own songs"
+-- Policy: Everyone can read (for simplicity)
+create policy "Enable read access for all users"
 on eid_songs for select
-using (
-  auth.email() = parent_email
-  OR auth.role() = 'authenticated'
-);
+using (true);
 
 -- Policy: Everyone can insert songs
 create policy "Enable insert access for all users"
 on eid_songs for insert
 with check (true);
 
--- Policy: Users can update their own songs
-create policy "Enable update access for own songs"
-on eid_songs for update
-using (auth.email() = parent_email);
-
--- Policy: Users can delete their own songs
-create policy "Enable delete access for own songs"
-on eid_songs for delete
-using (auth.email() = parent_email);
-
 -- Create index for faster queries
 create index if not exists idx_eid_songs_email on eid_songs(parent_email);
 create index if not exists idx_eid_songs_created on eid_songs(created_at desc);
-create index if not exists idx_eid_songs_child on eid_songs(child_name);
 
 
 -- ============================================
