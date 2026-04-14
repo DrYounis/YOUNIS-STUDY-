@@ -315,6 +315,30 @@ export default function Home() {
                                 Take your exams here! Good luck! 🎯
                             </p>
                         </a>
+
+                        {/* 🧩 Younis Store Card */}
+                        <Link
+                            href="/store"
+                            className="fun-card"
+                            style={{
+                                background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+                                borderRadius: '1.5rem',
+                                padding: '2rem',
+                                textDecoration: 'none',
+                                color: 'white',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                                textAlign: 'center',
+                            }}
+                        >
+                            <div className="fun-icon" style={{ fontSize: '5rem', marginBottom: '1rem' }}>🧩</div>
+                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                                Younis Store
+                            </h3>
+                            <p style={{ fontSize: '1rem', opacity: 0.9, lineHeight: '1.5' }}>
+                                Create your own custom puzzle with your photo! Only 50 SAR 🎉
+                            </p>
+                        </Link>
                     </div>                    {/* More Fun Button */}
                     <div style={{ textAlign: 'center', marginTop: '3rem' }}>
                         <a
