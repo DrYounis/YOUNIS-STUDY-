@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { naskhLessons } from '../../../lib/naskhLessons';
 import ClientProgressWrapper from './ClientProgressWrapper';
 
+// Force dynamic rendering - skip static generation at build time
+export const dynamic = 'force-dynamic';
+
 // Define metadata for SEO
 export const metadata = {
     title: 'تعلم خط النسخ | Younis Adventures',
