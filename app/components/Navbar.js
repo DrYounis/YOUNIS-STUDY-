@@ -83,6 +83,7 @@ export default function Navbar() {
                     <Link href="/blog" style={navStyles.link}>Diaries</Link>
                     <Link href="/friends" style={navStyles.link}>Friends</Link>
                     <Link href="/about" style={navStyles.link}>About</Link>
+                    <Link href="/practice/naskh" style={{...navStyles.link, background: '#FF9800', color: 'white', padding: '0.3rem 0.8rem', borderRadius: '8px', border: '2px solid #FFB74D', fontWeight: 'bold'}}>🖋️ خط النسخ</Link>
                 </div>
 
                 {/* Mobile Toggle */}
@@ -98,6 +99,7 @@ export default function Navbar() {
                     <Link href="/blog" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Diaries</Link>
                     <Link href="/friends" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>Friends</Link>
                     <Link href="/about" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem' }}>About</Link>
+                    <Link href="/practice/naskh" onClick={toggleMenu} style={{ ...navStyles.link, fontSize: '1.2rem', color: '#FF9800', fontWeight: 'bold' }}>🖋️ خط النسخ</Link>
                 </div>
             </div>
             <style jsx>{`
