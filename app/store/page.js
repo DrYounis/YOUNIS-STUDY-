@@ -6,6 +6,15 @@ import { compressImage, formatFileSize } from '../../lib/imageCompression';
 import { uploadImageToStorage } from '../../lib/supabaseUpload';
 import { submitOrder } from '../../lib/supabaseOrders';
 
+// Import Arabic font
+if (typeof document !== 'undefined' && !document.querySelector('[data-arabic-font]')) {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap';
+    link.rel = 'stylesheet';
+    link.setAttribute('data-arabic-font', 'true');
+    document.head.appendChild(link);
+}
+
 export default function StorePage() {
     const router = useRouter();
     const fileInputRef = useRef(null);
@@ -32,6 +41,14 @@ export default function StorePage() {
 
     // Payment state
     const [paymentMethod, setPaymentMethod] = useState('');
+    const [bankTransferConfirmed, setBankTransferConfirmed] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const handleCopyIban = () => {
+        navigator.clipboard.writeText('SA5745000000163199383001');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     // Errors
     const [errors, setErrors] = useState({});
@@ -120,7 +137,11 @@ export default function StorePage() {
     // Validate step 3 (payment)
     const validateStep3 = () => {
         if (!paymentMethod) {
-            setErrors({ payment: 'Please select a payment method' });
+            setErrors({ payment: 'الرجاء اختيار طريقة الدفع' });
+            return false;
+        }
+        if (paymentMethod === 'bank_transfer' && !bankTransferConfirmed) {
+            setErrors({ payment: 'الرجاء تأكيد إتمام التحويل البنكي للمتابعة' });
             return false;
         }
         return true;
@@ -180,17 +201,17 @@ export default function StorePage() {
     };
 
     return (
-        <div style={styles.page}>
+        <div style={styles.page} dir="rtl">
             <div style={styles.container}>
                 {/* Header */}
                 <div style={styles.header}>
-                    <h1 style={styles.title}>🧩 Younis Store</h1>
-                    <p style={styles.subtitle}>Create Your Own Puzzle!</p>
+                    <h1 style={styles.title}>🧩 متجر يونس</h1>
+                    <p style={styles.subtitle}>اصنع لعبة البازل الخاصة بك</p>
                 </div>
 
                 {/* Progress Steps */}
                 <div style={styles.progressContainer}>
-                    {['Upload Photo', 'Your Details', 'Payment', 'Confirm'].map((label, i) => (
+                    {['رفع الصورة', 'بياناتك', 'الدفع', 'تأكيد'].map((label, i) => (
                         <div key={label} style={styles.progressStep}>
                             <div style={{
                                 ...styles.progressCircle,
@@ -215,8 +236,8 @@ export default function StorePage() {
                     {/* STEP 1: Upload */}
                     {step === 1 && (
                         <div style={styles.stepContent}>
-                            <h2 style={styles.stepTitle}>📸 Upload Your Photo</h2>
-                            <p style={styles.stepDesc}>Choose a photo to be printed on your custom puzzle!</p>
+                            <h2 style={styles.stepTitle}>📸 رفع الصورة</h2>
+                            <p style={styles.stepDesc}>اختر صورة لطباعتها على البازل المخصصة لك</p>
 
                             <div
                                 style={{
@@ -236,24 +257,24 @@ export default function StorePage() {
                                 {compressing ? (
                                     <div style={styles.compressing}>
                                         <div style={styles.spinner}></div>
-                                        <p>Compressing your image...</p>
+                                        <p>جاري ضغط الصورة...</p>
                                     </div>
                                 ) : previewUrl ? (
                                     <div style={styles.previewContainer}>
                                         <img src={previewUrl} alt="Preview" style={styles.previewImage} />
                                         <div style={styles.previewInfo}>
-                                            <p style={styles.previewText}>✅ Image uploaded!</p>
+                                            <p style={styles.previewText}>✅ تم رفع الصورة!</p>
                                             <p style={styles.previewText}>
-                                                Original: {formatFileSize(originalSize)}
-                                                {compressedBlob && ` → Compressed: ${formatFileSize(compressedBlob.size)}`}
+                                                الحجم الأصلي: {formatFileSize(originalSize)}
+                                                {compressedBlob && ` → بعد الضغط: ${formatFileSize(compressedBlob.size)}`}
                                             </p>
                                         </div>
                                     </div>
                                 ) : (
                                     <div style={styles.uploadPlaceholder}>
                                         <span style={{ fontSize: '4rem' }}>🖼️</span>
-                                        <p style={styles.uploadText}>Click to upload your photo</p>
-                                        <p style={styles.uploadHint}>JPG, PNG up to 10MB</p>
+                                        <p style={styles.uploadText}>اضغط لرفع الصورة</p>
+                                        <p style={styles.uploadHint}>JPG, PNG حتى 10MB</p>
                                     </div>
                                 )}
                             </div>
@@ -261,7 +282,7 @@ export default function StorePage() {
                             {errors.file && <p style={styles.errorText}>{errors.file}</p>}
 
                             <div style={styles.priceTag}>
-                                <span style={styles.priceLabel}>Price:</span>
+                                <span style={styles.priceLabel}>السعر:</span>
                                 <span style={styles.priceValue}>{PRICE} {CURRENCY}</span>
                             </div>
                         </div>
@@ -270,18 +291,18 @@ export default function StorePage() {
                     {/* STEP 2: Details */}
                     {step === 2 && (
                         <div style={styles.stepContent}>
-                            <h2 style={styles.stepTitle}>👤 Your Details</h2>
-                            <p style={styles.stepDesc}>Tell us how to reach you and where to deliver!</p>
+                            <h2 style={styles.stepTitle}>👤 بياناتك</h2>
+                            <p style={styles.stepDesc}>أخبرنا كيف نصل إليك وأين نوصل!</p>
 
                             <div style={styles.formGrid}>
                                 <div style={styles.formGroup}>
-                                    <label style={styles.label}>Your Name *</label>
+                                    <label style={styles.label}>اسم الطفل *</label>
                                     <input
                                         type="text"
                                         name="customerName"
                                         value={formData.customerName}
                                         onChange={handleInputChange}
-                                        placeholder="Enter your name"
+                                        placeholder="أدخل اسم الطفل"
                                         style={{
                                             ...styles.input,
                                             borderColor: errors.customerName ? '#f44336' : '#ddd',
@@ -291,7 +312,7 @@ export default function StorePage() {
                                 </div>
 
                                 <div style={styles.formGroup}>
-                                    <label style={styles.label}>Phone Number *</label>
+                                    <label style={styles.label}>الجوال *</label>
                                     <input
                                         type="tel"
                                         name="phone"
@@ -307,7 +328,7 @@ export default function StorePage() {
                                 </div>
 
                                 <div style={styles.formGroup}>
-                                    <label style={styles.label}>Email *</label>
+                                    <label style={styles.label}>البريد الإلكتروني *</label>
                                     <input
                                         type="email"
                                         name="email"
@@ -325,7 +346,7 @@ export default function StorePage() {
 
                             {/* Delivery Options */}
                             <div style={styles.formGroup}>
-                                <label style={styles.label}>Delivery Method *</label>
+                                <label style={styles.label}>طريقة التوصيل *</label>
                                 <div style={styles.deliveryOptions}>
                                     <button
                                         type="button"
@@ -337,7 +358,7 @@ export default function StorePage() {
                                         }}
                                     >
                                         <span style={{ fontSize: '2rem' }}>🏫</span>
-                                        <span>Pick up at School</span>
+                                        <span>مدرسة</span>
                                     </button>
                                     <button
                                         type="button"
@@ -349,7 +370,7 @@ export default function StorePage() {
                                         }}
                                     >
                                         <span style={{ fontSize: '2rem' }}>🏠</span>
-                                        <span>Home Delivery</span>
+                                        <span>المنزل</span>
                                     </button>
                                 </div>
                             </div>
@@ -357,13 +378,13 @@ export default function StorePage() {
                             {/* School fields */}
                             {formData.deliveryType === 'school' && (
                                 <div style={styles.formGroup}>
-                                    <label style={styles.label}>School Name *</label>
+                                    <label style={styles.label}>اسم المدرسة *</label>
                                     <input
                                         type="text"
                                         name="schoolName"
                                         value={formData.schoolName}
                                         onChange={handleInputChange}
-                                        placeholder="Enter school name"
+                                        placeholder="أدخل اسم المدرسة"
                                         style={{
                                             ...styles.input,
                                             borderColor: errors.schoolName ? '#f44336' : '#ddd',
@@ -377,12 +398,12 @@ export default function StorePage() {
                             {formData.deliveryType === 'home' && (
                                 <div style={styles.formGrid}>
                                     <div style={styles.formGroup}>
-                                        <label style={styles.label}>Full Address *</label>
+                                        <label style={styles.label}>العنوان *</label>
                                         <textarea
                                             name="homeAddress"
                                             value={formData.homeAddress}
                                             onChange={handleInputChange}
-                                            placeholder="Street, building, apartment..."
+                                            placeholder="الشارع، المبنى، الشقة..."
                                             rows={3}
                                             style={{
                                                 ...styles.input,
@@ -393,13 +414,13 @@ export default function StorePage() {
                                         {errors.homeAddress && <p style={styles.errorText}>{errors.homeAddress}</p>}
                                     </div>
                                     <div style={styles.formGroup}>
-                                        <label style={styles.label}>City *</label>
+                                        <label style={styles.label}>المدينة *</label>
                                         <input
                                             type="text"
                                             name="homeCity"
                                             value={formData.homeCity}
                                             onChange={handleInputChange}
-                                            placeholder="City"
+                                            placeholder="المدينة"
                                             style={{
                                                 ...styles.input,
                                                 borderColor: errors.homeCity ? '#f44336' : '#ddd',
@@ -408,13 +429,13 @@ export default function StorePage() {
                                         {errors.homeCity && <p style={styles.errorText}>{errors.homeCity}</p>}
                                     </div>
                                     <div style={styles.formGroup}>
-                                        <label style={styles.label}>Delivery Phone</label>
+                                        <label style={styles.label}>جوال التوصيل</label>
                                         <input
                                             type="tel"
                                             name="homePhone"
                                             value={formData.homePhone}
                                             onChange={handleInputChange}
-                                            placeholder="Contact phone for delivery"
+                                            placeholder="جوال للتواصل عند التوصيل"
                                             style={styles.input}
                                         />
                                     </div>
@@ -426,23 +447,23 @@ export default function StorePage() {
                     {/* STEP 3: Payment */}
                     {step === 3 && (
                         <div style={styles.stepContent}>
-                            <h2 style={styles.stepTitle}>💳 Payment Method</h2>
-                            <p style={styles.stepDesc}>Choose how you'd like to pay</p>
+                            <h2 style={styles.stepTitle}>💳 الدفع</h2>
+                            <p style={styles.stepDesc}>اختر طريقة الدفع</p>
 
                             <div style={styles.orderSummary}>
-                                <h3 style={styles.summaryTitle}>Order Summary</h3>
+                                <h3 style={styles.summaryTitle}>ملخص الطلب</h3>
                                 <div style={styles.summaryRow}>
-                                    <span>Custom Puzzle - "My Puzzle"</span>
+                                    <span>بازل مخصصة - "بازلتي"</span>
                                     <span>{PRICE} {CURRENCY}</span>
                                 </div>
                                 <div style={styles.summaryTotal}>
-                                    <span>Total</span>
+                                    <span>الإجمالي</span>
                                     <span>{PRICE} {CURRENCY}</span>
                                 </div>
                             </div>
 
                             <div style={styles.formGroup}>
-                                <label style={styles.label}>Select Payment Method *</label>
+                                <label style={styles.label}>اختر طريقة الدفع *</label>
                                 <div style={styles.paymentOptions}>
                                     <button
                                         type="button"
@@ -457,9 +478,9 @@ export default function StorePage() {
                                         }}
                                     >
                                         <span style={{ fontSize: '2.5rem' }}>🏦</span>
-                                        <span style={styles.paymentOptionTitle}>Bank Transfer</span>
+                                        <span style={styles.paymentOptionTitle}>تحويل بنكي</span>
                                         <span style={styles.paymentOptionDesc}>
-                                            Transfer to our account. Payment will be confirmed manually.
+                                            حوّل إلى حسابنا. سيتم تأكيد الدفع يدوياً.
                                         </span>
                                     </button>
 
@@ -476,9 +497,9 @@ export default function StorePage() {
                                         }}
                                     >
                                         <span style={{ fontSize: '2.5rem' }}>🍎</span>
-                                        <span style={styles.paymentOptionTitle}>Apple Pay</span>
+                                        <span style={styles.paymentOptionTitle}>أبل باي</span>
                                         <span style={styles.paymentOptionDesc}>
-                                            Pay instantly with Apple Pay.
+                                            ادفع فوراً عبر أبل باي.
                                         </span>
                                     </button>
                                 </div>
@@ -488,27 +509,56 @@ export default function StorePage() {
                             {/* Bank Transfer Details */}
                             {paymentMethod === 'bank_transfer' && (
                                 <div style={styles.bankDetails}>
-                                    <h4 style={styles.bankTitle}>🏦 Bank Transfer Details</h4>
-                                    <div style={styles.bankRow}>
-                                        <span style={styles.bankLabel}>Bank:</span>
-                                        <span style={styles.bankValue}>Al Rajhi Bank</span>
+                                    <h4 style={styles.bankTitle}>تفاصيل التحويل البنكي</h4>
+                                    
+                                    <div style={styles.bankBox}>
+                                        <div style={styles.bankRow}>
+                                            <span style={styles.bankLabel}>رقم الأيبان (IBAN):</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <span style={{ ...styles.bankValue, direction: 'ltr', display: 'inline-block' }}>SA5745000000163199383001</span>
+                                                <button 
+                                                    type="button" 
+                                                    onClick={handleCopyIban}
+                                                    style={styles.copyBtn}
+                                                >
+                                                    {copied ? '✅ تم النسخ' : '📋 نسخ الأيبان'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div style={styles.bankRow}>
+                                            <span style={styles.bankLabel}>اسم صاحب الحساب (عربي):</span>
+                                            <span style={styles.bankValue}>شركة نظم الهندسة المبتكرة</span>
+                                        </div>
+                                        <div style={styles.bankRow}>
+                                            <span style={styles.bankLabel}>اسم صاحب الحساب (إنجليزي):</span>
+                                            <span style={{...styles.bankValue, direction: 'ltr', display: 'inline-block'}}>NATHM ALHINDASA ALMUBTAKARA</span>
+                                        </div>
+                                        <div style={styles.bankRow}>
+                                            <span style={styles.bankLabel}>البنك:</span>
+                                            <span style={styles.bankValue}>البنك الأهلي السعودي</span>
+                                        </div>
+                                        <div style={styles.bankRow}>
+                                            <span style={styles.bankLabel}>المبلغ:</span>
+                                            <span style={styles.bankValue}>{PRICE} {CURRENCY}</span>
+                                        </div>
                                     </div>
-                                    <div style={styles.bankRow}>
-                                        <span style={styles.bankLabel}>Account Name:</span>
-                                        <span style={styles.bankValue}>Younis Store</span>
+                                    
+                                    <div style={styles.warningMessage}>
+                                        ⚠️ يرجى إرسال صورة إيصال التحويل على واتساب [رقم الواتساب] لإتمام الطلب
                                     </div>
-                                    <div style={styles.bankRow}>
-                                        <span style={styles.bankLabel}>IBAN:</span>
-                                        <span style={styles.bankValue}>SA00 0000 0000 0000 0000 0000</span>
-                                    </div>
-                                    <div style={styles.bankRow}>
-                                        <span style={styles.bankLabel}>Amount:</span>
-                                        <span style={styles.bankValue}>{PRICE} {CURRENCY}</span>
-                                    </div>
-                                    <p style={styles.bankNote}>
-                                        ⚠️ After transfer, your order will be pending until we confirm payment.
-                                        We will contact you via the phone/email you provided.
-                                    </p>
+                                    
+                                    <label style={styles.confirmCheckboxLabel}>
+                                        <input 
+                                            type="checkbox" 
+                                            checked={bankTransferConfirmed}
+                                            onChange={(e) => {
+                                                setBankTransferConfirmed(e.target.checked);
+                                                if (e.target.checked) setErrors({...errors, payment: ''});
+                                            }}
+                                            style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+                                        />
+                                        <span>أؤكد أنني قمت بالتحويل</span>
+                                    </label>
                                 </div>
                             )}
                         </div>
@@ -517,54 +567,54 @@ export default function StorePage() {
                     {/* STEP 4: Confirm */}
                     {step === 4 && (
                         <div style={styles.stepContent}>
-                            <h2 style={styles.stepTitle}>✅ Review & Confirm</h2>
-                            <p style={styles.stepDesc}>Please review your order before submitting</p>
+                            <h2 style={styles.stepTitle}>✅ مراجعة وتأكيد</h2>
+                            <p style={styles.stepDesc}>يرجى مراجعة طلبك قبل الإرسال</p>
 
                             <div style={styles.reviewSection}>
                                 <div style={styles.reviewCard}>
-                                    <h3 style={styles.reviewTitle}>📸 Your Photo</h3>
+                                    <h3 style={styles.reviewTitle}>📸 صورتك</h3>
                                     {previewUrl && (
                                         <img src={previewUrl} alt="Your puzzle photo" style={styles.reviewImage} />
                                     )}
                                 </div>
 
                                 <div style={styles.reviewCard}>
-                                    <h3 style={styles.reviewTitle}>👤 Your Details</h3>
+                                    <h3 style={styles.reviewTitle}>👤 بياناتك</h3>
                                     <div style={styles.reviewRow}>
-                                        <span style={styles.reviewLabel}>Name:</span>
+                                        <span style={styles.reviewLabel}>الاسم:</span>
                                         <span>{formData.customerName}</span>
                                     </div>
                                     <div style={styles.reviewRow}>
-                                        <span style={styles.reviewLabel}>Phone:</span>
+                                        <span style={styles.reviewLabel}>الجوال:</span>
                                         <span>{formData.phone}</span>
                                     </div>
                                     <div style={styles.reviewRow}>
-                                        <span style={styles.reviewLabel}>Email:</span>
+                                        <span style={styles.reviewLabel}>البريد الإلكتروني:</span>
                                         <span>{formData.email}</span>
                                     </div>
                                 </div>
 
                                 <div style={styles.reviewCard}>
-                                    <h3 style={styles.reviewTitle}>🚚 Delivery</h3>
+                                    <h3 style={styles.reviewTitle}>🚚 التوصيل</h3>
                                     <div style={styles.reviewRow}>
-                                        <span style={styles.reviewLabel}>Method:</span>
-                                        <span>{formData.deliveryType === 'school' ? '🏫 School Pickup' : '🏠 Home Delivery'}</span>
+                                        <span style={styles.reviewLabel}>الطريقة:</span>
+                                        <span>{formData.deliveryType === 'school' ? '🏫 استلام من المدرسة' : '🏠 توصيل للمنزل'}</span>
                                     </div>
                                     {formData.deliveryType === 'school' && (
                                         <div style={styles.reviewRow}>
-                                            <span style={styles.reviewLabel}>School:</span>
+                                            <span style={styles.reviewLabel}>المدرسة:</span>
                                             <span>{formData.schoolName}</span>
                                         </div>
                                     )}
                                     {formData.deliveryType === 'home' && (
                                         <>
                                             <div style={styles.reviewRow}>
-                                                <span style={styles.reviewLabel}>Address:</span>
+                                                <span style={styles.reviewLabel}>العنوان:</span>
                                                 <span>{formData.homeAddress}, {formData.homeCity}</span>
                                             </div>
                                             {formData.homePhone && (
                                                 <div style={styles.reviewRow}>
-                                                    <span style={styles.reviewLabel}>Delivery Phone:</span>
+                                                    <span style={styles.reviewLabel}>جوال التوصيل:</span>
                                                     <span>{formData.homePhone}</span>
                                                 </div>
                                             )}
@@ -573,13 +623,13 @@ export default function StorePage() {
                                 </div>
 
                                 <div style={styles.reviewCard}>
-                                    <h3 style={styles.reviewTitle}>💳 Payment</h3>
+                                    <h3 style={styles.reviewTitle}>💳 الدفع</h3>
                                     <div style={styles.reviewRow}>
-                                        <span style={styles.reviewLabel}>Method:</span>
-                                        <span>{paymentMethod === 'bank_transfer' ? '🏦 Bank Transfer' : '🍎 Apple Pay'}</span>
+                                        <span style={styles.reviewLabel}>الطريقة:</span>
+                                        <span>{paymentMethod === 'bank_transfer' ? '🏦 تحويل بنكي' : '🍎 أبل باي'}</span>
                                     </div>
                                     <div style={styles.reviewRow}>
-                                        <span style={styles.reviewLabel}>Amount:</span>
+                                        <span style={styles.reviewLabel}>المبلغ:</span>
                                         <span style={styles.reviewTotal}>{PRICE} {CURRENCY}</span>
                                     </div>
                                 </div>
@@ -593,17 +643,17 @@ export default function StorePage() {
                     <div style={styles.buttonRow}>
                         {step > 1 && step < 4 && (
                             <button onClick={prevStep} style={styles.btnSecondary}>
-                                ← Back
+                                → رجوع
                             </button>
                         )}
                         {step < 3 && (
                             <button onClick={nextStep} style={styles.btnPrimary}>
-                                Next →
+                                التالي ←
                             </button>
                         )}
                         {step === 3 && (
                             <button onClick={nextStep} style={styles.btnPrimary}>
-                                Review Order →
+                                مراجعة الطلب ←
                             </button>
                         )}
                         {step === 4 && (
@@ -616,7 +666,7 @@ export default function StorePage() {
                                     cursor: submitting ? 'not-allowed' : 'pointer',
                                 }}
                             >
-                                {submitting ? '⏳ Submitting...' : `🎉 Place Order - ${PRICE} ${CURRENCY}`}
+                                {submitting ? '⏳ جاري الإرسال...' : `🎉 تقديم الطلب - ${PRICE} {CURRENCY}`}
                             </button>
                         )}
                     </div>
@@ -632,7 +682,7 @@ const styles = {
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         padding: '2rem 1rem',
-        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        fontFamily: "'Cairo', 'Inter', 'Segoe UI', sans-serif",
     },
     container: {
         maxWidth: '800px',
@@ -889,6 +939,46 @@ const styles = {
     bankValue: {
         fontWeight: '600',
         color: '#333',
+    },
+    bankBox: {
+        backgroundColor: '#fff',
+        padding: '1rem',
+        borderRadius: '10px',
+        border: '1px dashed #4CAF50',
+        marginBottom: '1rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem',
+    },
+    copyBtn: {
+        backgroundColor: '#E8F5E9',
+        color: '#4CAF50',
+        border: '1px solid #4CAF50',
+        borderRadius: '5px',
+        padding: '0.3rem 0.6rem',
+        fontSize: '0.85rem',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'all 0.2s',
+    },
+    warningMessage: {
+        backgroundColor: '#FFF9C4',
+        color: '#F57F17',
+        padding: '1rem',
+        borderRadius: '8px',
+        marginBottom: '1rem',
+        fontWeight: 'bold',
+        fontSize: '0.95rem',
+        textAlign: 'center',
+    },
+    confirmCheckboxLabel: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        color: '#333',
+        padding: '0.5rem 0',
     },
     bankNote: {
         marginTop: '1rem',

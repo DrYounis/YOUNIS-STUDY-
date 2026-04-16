@@ -5,6 +5,15 @@ import { getAllOrders, updateOrder, exportOrdersAsJSON } from '../../../lib/supa
 
 const ADMIN_PASSWORD = 'younis2024'; // Change this to your desired password
 
+// Import Arabic font
+if (typeof document !== 'undefined' && !document.querySelector('[data-arabic-font]')) {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap';
+    link.rel = 'stylesheet';
+    link.setAttribute('data-arabic-font', 'true');
+    document.head.appendChild(link);
+}
+
 export default function AdminOrdersPage() {
     const [authenticated, setAuthenticated] = useState(false);
     const [passwordInput, setPasswordInput] = useState('');
@@ -119,9 +128,9 @@ export default function AdminOrdersPage() {
             const orders = JSON.parse(ordersData);
 
             const headers = [
-                'Order ID', 'Date', 'Customer Name', 'Phone', 'Email',
-                'Delivery Type', 'School', 'Address', 'City',
-                'Payment Method', 'Status', 'Price (SAR)'
+                'رقم الطلب', 'التاريخ', 'اسم العميل', 'الجوال', 'البريد الإلكتروني',
+                'نوع التوصيل', 'المدرسة', 'العنوان', 'المدينة',
+                'طريقة الدفع', 'الحالة', 'السعر (ريال)'
             ];
 
             const rows = orders.map(order => [
@@ -134,7 +143,7 @@ export default function AdminOrdersPage() {
                 order.schoolName || '',
                 order.homeAddress || '',
                 order.homeCity || '',
-                order.paymentMethod === 'bank_transfer' ? 'Bank Transfer' : 'Apple Pay',
+                order.paymentMethod === 'bank_transfer' ? 'تحويل بنكي' : 'أبل باي',
                 order.status || 'pending',
                 order.price || 50,
             ]);
@@ -176,21 +185,21 @@ export default function AdminOrdersPage() {
     // Password screen
     if (!authenticated) {
         return (
-            <div style={styles.page}>
+            <div style={styles.page} dir="rtl">
                 <div style={styles.loginCard}>
-                    <h1 style={styles.loginTitle}>🔐 Admin Access</h1>
-                    <p style={styles.loginSubtitle}>Enter password to view orders</p>
+                    <h1 style={styles.loginTitle}>🔐 لوحة التحكم</h1>
+                    <p style={styles.loginSubtitle}>أدخل كلمة المرور لعرض الطلبات</p>
                     <form onSubmit={handlePasswordSubmit} style={styles.loginForm}>
                         <input
                             type="password"
                             value={passwordInput}
                             onChange={(e) => setPasswordInput(e.target.value)}
-                            placeholder="Enter admin password"
+                            placeholder="أدخل كلمة المرور"
                             style={styles.passwordInput}
                         />
                         {passwordError && <p style={styles.errorText}>{passwordError}</p>}
                         <button type="submit" style={styles.loginBtn}>
-                            Access Orders
+                            دخول
                         </button>
                     </form>
                 </div>
@@ -199,20 +208,20 @@ export default function AdminOrdersPage() {
     }
 
     return (
-        <div style={styles.page}>
+        <div style={styles.page} dir="rtl">
             <div style={styles.container}>
                 {/* Header */}
                 <div style={styles.header}>
-                    <h1 style={styles.title}>📦 Younis Store - Orders</h1>
+                    <h1 style={styles.title}>📦 متجر يونس - الطلبات</h1>
                     <div style={styles.headerActions}>
                         <button onClick={loadOrders} style={styles.btnRefresh} disabled={loading}>
-                            {loading ? '⏳ Loading...' : '🔄 Refresh'}
+                            {loading ? '⏳ جاري التحميل...' : '🔄 تحديث'}
                         </button>
                         <button onClick={handleExport} style={styles.btnExport}>
-                            📥 Export JSON
+                            📥 تصدير JSON
                         </button>
                         <button onClick={handleExportCSV} style={styles.btnExport}>
-                            📊 Export CSV
+                            📊 تصدير CSV
                         </button>
                     </div>
                 </div>
@@ -221,25 +230,25 @@ export default function AdminOrdersPage() {
                 <div style={styles.statsRow}>
                     <div style={styles.statCard}>
                         <span style={styles.statNumber}>{orders.length}</span>
-                        <span style={styles.statLabel}>Total Orders</span>
+                        <span style={styles.statLabel}>إجمالي الطلبات</span>
                     </div>
                     <div style={{ ...styles.statCard, backgroundColor: '#FFF3E0' }}>
                         <span style={{ ...styles.statNumber, color: '#FF9800' }}>
                             {orders.filter(o => o.status === 'pending').length}
                         </span>
-                        <span style={styles.statLabel}>Pending Payment</span>
+                        <span style={styles.statLabel}>قيد الانتظار</span>
                     </div>
                     <div style={{ ...styles.statCard, backgroundColor: '#E8F5E9' }}>
                         <span style={{ ...styles.statNumber, color: '#4CAF50' }}>
                             {orders.filter(o => o.status === 'paid').length}
                         </span>
-                        <span style={styles.statLabel}>Paid</span>
+                        <span style={styles.statLabel}>مدفوع</span>
                     </div>
                     <div style={{ ...styles.statCard, backgroundColor: '#E3F2FD' }}>
                         <span style={{ ...styles.statNumber, color: '#2196F3' }}>
-                            {orders.reduce((sum, o) => sum + (o.price || 50), 0)} SAR
+                            {orders.reduce((sum, o) => sum + (o.price || 50), 0)} ريال
                         </span>
-                        <span style={styles.statLabel}>Total Revenue</span>
+                        <span style={styles.statLabel}>إجمالي الإيرادات</span>
                     </div>
                 </div>
 
@@ -253,7 +262,7 @@ export default function AdminOrdersPage() {
                             color: filter === 'all' ? '#fff' : '#666',
                         }}
                     >
-                        All ({orders.length})
+                        الكل ({orders.length})
                     </button>
                     <button
                         onClick={() => setFilter('pending')}
@@ -263,7 +272,7 @@ export default function AdminOrdersPage() {
                             color: filter === 'pending' ? '#fff' : '#666',
                         }}
                     >
-                        Pending ({orders.filter(o => o.status === 'pending').length})
+                        قيد الانتظار ({orders.filter(o => o.status === 'pending').length})
                     </button>
                     <button
                         onClick={() => setFilter('paid')}
@@ -273,7 +282,7 @@ export default function AdminOrdersPage() {
                             color: filter === 'paid' ? '#fff' : '#666',
                         }}
                     >
-                        Paid ({orders.filter(o => o.status === 'paid').length})
+                        مدفوع ({orders.filter(o => o.status === 'paid').length})
                     </button>
                 </div>
 
@@ -284,12 +293,12 @@ export default function AdminOrdersPage() {
                 {loading && orders.length === 0 ? (
                     <div style={styles.loading}>
                         <div style={styles.spinner}></div>
-                        <p>Loading orders...</p>
+                        <p>جاري تحميل الطلبات...</p>
                     </div>
                 ) : filteredOrders.length === 0 ? (
                     <div style={styles.emptyState}>
                         <span style={{ fontSize: '4rem' }}>📭</span>
-                        <p>No orders found</p>
+                        <p>لا توجد طلبات</p>
                     </div>
                 ) : (
                     <div style={styles.ordersList}>
@@ -298,7 +307,7 @@ export default function AdminOrdersPage() {
                                 {/* Order Header */}
                                 <div style={styles.orderHeader}>
                                     <div>
-                                        <h3 style={styles.orderId}>Order #{order.id.slice(0, 8)}</h3>
+                                        <h3 style={styles.orderId}>طلب #{order.id.slice(0, 8)}</h3>
                                         <p style={styles.orderDate}>{formatDate(order.createdAt)}</p>
                                     </div>
                                     <div style={styles.statusBadges}>
@@ -306,7 +315,7 @@ export default function AdminOrdersPage() {
                                             ...styles.badge,
                                             backgroundColor: order.status === 'paid' ? '#4CAF50' : '#FF9800',
                                         }}>
-                                            {order.status === 'paid' ? '✓ Paid' : '⏳ Pending'}
+                                            {order.status === 'paid' ? '✓ مدفوع' : '⏳ قيد الانتظار'}
                                         </span>
                                         {order.deliveryStatus && (
                                             <span style={{
@@ -321,45 +330,45 @@ export default function AdminOrdersPage() {
 
                                 {/* Customer Info */}
                                 <div style={styles.orderSection}>
-                                    <h4 style={styles.sectionTitle}>👤 Customer</h4>
+                                    <h4 style={styles.sectionTitle}>👤 العميل</h4>
                                     <div style={styles.infoGrid}>
-                                        <div><strong>Name:</strong> {order.customerName}</div>
-                                        <div><strong>Phone:</strong> {order.phone}</div>
-                                        <div><strong>Email:</strong> {order.email}</div>
+                                        <div><strong>الاسم:</strong> {order.customerName}</div>
+                                        <div><strong>الجوال:</strong> {order.phone}</div>
+                                        <div><strong>البريد الإلكتروني:</strong> {order.email}</div>
                                     </div>
                                 </div>
 
                                 {/* Delivery Info */}
                                 <div style={styles.orderSection}>
-                                    <h4 style={styles.sectionTitle}>🚚 Delivery</h4>
+                                    <h4 style={styles.sectionTitle}>🚚 التوصيل</h4>
                                     <div style={styles.infoGrid}>
                                         <div>
-                                            <strong>Type:</strong>{' '}
-                                            {order.deliveryType === 'school' ? '🏫 School Pickup' : '🏠 Home Delivery'}
+                                            <strong>الطريقة:</strong>{' '}
+                                            {order.deliveryType === 'school' ? '🏫 استلام من المدرسة' : '🏠 توصيل للمنزل'}
                                         </div>
-                                        {order.schoolName && <div><strong>School:</strong> {order.schoolName}</div>}
-                                        {order.homeAddress && <div><strong>Address:</strong> {order.homeAddress}</div>}
-                                        {order.homeCity && <div><strong>City:</strong> {order.homeCity}</div>}
-                                        {order.homePhone && <div><strong>Delivery Phone:</strong> {order.homePhone}</div>}
+                                        {order.schoolName && <div><strong>المدرسة:</strong> {order.schoolName}</div>}
+                                        {order.homeAddress && <div><strong>العنوان:</strong> {order.homeAddress}</div>}
+                                        {order.homeCity && <div><strong>المدينة:</strong> {order.homeCity}</div>}
+                                        {order.homePhone && <div><strong>جوال التوصيل:</strong> {order.homePhone}</div>}
                                     </div>
                                 </div>
 
                                 {/* Payment Info */}
                                 <div style={styles.orderSection}>
-                                    <h4 style={styles.sectionTitle}>💳 Payment</h4>
+                                    <h4 style={styles.sectionTitle}>💳 الدفع</h4>
                                     <div style={styles.infoGrid}>
                                         <div>
-                                            <strong>Method:</strong>{' '}
-                                            {order.paymentMethod === 'bank_transfer' ? '🏦 Bank Transfer' : '🍎 Apple Pay'}
+                                            <strong>الطريقة:</strong>{' '}
+                                            {order.paymentMethod === 'bank_transfer' ? '🏦 تحويل بنكي' : '🍎 أبل باي'}
                                         </div>
-                                        <div><strong>Amount:</strong> {order.price || 50} SAR</div>
+                                        <div><strong>المبلغ:</strong> {order.price || 50} ريال</div>
                                     </div>
                                 </div>
 
                                 {/* Image */}
                                 {order.imageUrl && (
                                     <div style={styles.orderSection}>
-                                        <h4 style={styles.sectionTitle}>📸 Puzzle Photo</h4>
+                                        <h4 style={styles.sectionTitle}>📸 صورة البازل</h4>
                                         <a href={order.imageUrl} target="_blank" rel="noopener noreferrer">
                                             <img src={order.imageUrl} alt="Puzzle" style={styles.orderImage} />
                                         </a>
@@ -374,7 +383,7 @@ export default function AdminOrdersPage() {
                                             disabled={updatingId === order.id}
                                             style={styles.btnConfirm}
                                         >
-                                            {updatingId === order.id ? '⏳ Updating...' : '✓ Confirm Payment'}
+                                            {updatingId === order.id ? '⏳ جاري التحديث...' : '✓ تأكيد الدفع'}
                                         </button>
                                     )}
 
@@ -384,10 +393,10 @@ export default function AdminOrdersPage() {
                                         disabled={updatingId === order.id}
                                         style={styles.deliverySelect}
                                     >
-                                        <option value="pending">🕐 Delivery Pending</option>
-                                        <option value="preparing">🧩 Preparing Puzzle</option>
-                                        <option value="ready">✅ Ready for Pickup</option>
-                                        <option value="delivered">🚚 Delivered</option>
+                                        <option value="pending">🕐 التوصيل قيد الانتظار</option>
+                                        <option value="preparing">🧩 جاري تجهيز البازل</option>
+                                        <option value="ready">✅ جاهز للاستلام</option>
+                                        <option value="delivered">🚚 تم التوصيل</option>
                                     </select>
                                 </div>
                             </div>
@@ -404,7 +413,7 @@ const styles = {
         minHeight: '100vh',
         backgroundColor: '#f5f5f5',
         padding: '2rem 1rem',
-        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        fontFamily: "'Cairo', 'Inter', 'Segoe UI', sans-serif",
     },
     loginCard: {
         maxWidth: '400px',

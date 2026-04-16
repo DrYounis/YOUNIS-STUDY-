@@ -4,45 +4,54 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 
+// Import Arabic font
+if (typeof document !== 'undefined' && !document.querySelector('[data-arabic-font]')) {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap';
+    link.rel = 'stylesheet';
+    link.setAttribute('data-arabic-font', 'true');
+    document.head.appendChild(link);
+}
+
 function ThankYouContent() {
     const searchParams = useSearchParams();
     const orderId = searchParams.get('orderId');
 
     return (
-        <div style={styles.page}>
+        <div style={styles.page} dir="rtl">
             <div style={styles.container}>
                 <div style={styles.card}>
                     <div style={styles.icon}>🎉</div>
-                    <h1 style={styles.title}>Thank You!</h1>
-                    <p style={styles.subtitle}>Your order has been placed successfully!</p>
+                    <h1 style={styles.title}>شكراً لك!</h1>
+                    <p style={styles.subtitle}>تم تقديم طلبك بنجاح!</p>
 
                     {orderId && (
                         <div style={styles.orderIdBox}>
-                            <p style={styles.orderIdLabel}>Order ID</p>
+                            <p style={styles.orderIdLabel}>رقم الطلب</p>
                             <p style={styles.orderIdValue}>{orderId}</p>
                         </div>
                     )}
 
                     <div style={styles.infoCard}>
-                        <h3 style={styles.infoTitle}>What happens next?</h3>
+                        <h3 style={styles.infoTitle}>ماذا سيحدث بعد ذلك؟</h3>
                         <ul style={styles.infoList}>
                             <li style={styles.infoItem}>
                                 <span style={styles.infoIcon}>📧</span>
-                                <span>We will contact you via email/phone to confirm your order.</span>
+                                <span>سنتواصل معك عبر البريد الإلكتروني/الجوال لتأكيد طلبك.</span>
                             </li>
                             <li style={styles.infoItem}>
                                 <span style={styles.infoIcon}>🧩</span>
-                                <span>Your custom puzzle will be printed with your photo.</span>
+                                <span>سيتم طباعة البازل المخصصة بصورتك.</span>
                             </li>
                             <li style={styles.infoItem}>
                                 <span style={styles.infoIcon}>🚚</span>
-                                <span>Delivery will be arranged based on your preference.</span>
+                                <span>سيتم ترتيب التوصيل حسب طريقتك المفضلة.</span>
                             </li>
                             <li style={styles.infoItem}>
                                 <span style={styles.infoIcon}>💳</span>
                                 <span>
-                                    If you chose <strong>Bank Transfer</strong>, please complete the transfer
-                                    and we will confirm payment manually.
+                                    إذا اخترت <strong>تحويل بنكي</strong>، يرجى إتمام التحويل
+                                    وسنؤكد الدفع يدوياً.
                                 </span>
                             </li>
                         </ul>
@@ -50,10 +59,10 @@ function ThankYouContent() {
 
                     <div style={styles.buttonRow}>
                         <Link href="/" style={styles.btnSecondary}>
-                            ← Back to Home
+                            رجوع للرئيسية ←
                         </Link>
                         <Link href="/store" style={styles.btnPrimary}>
-                            Order Another Puzzle 🧩
+                            اطلب بازل أخرى 🧩
                         </Link>
                     </div>
                 </div>
@@ -70,7 +79,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        fontFamily: "'Cairo', 'Inter', 'Segoe UI', sans-serif",
     },
     container: {
         maxWidth: '600px',

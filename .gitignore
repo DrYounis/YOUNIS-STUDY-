@@ -17,6 +17,11 @@
 .DS_Store
 *.pem
 
+# macOS resource forks (from external drives)
+._*
+._.DS_Store
+._.gitignore
+
 # debug
 npm-debug.log*
 yarn-debug.log*
